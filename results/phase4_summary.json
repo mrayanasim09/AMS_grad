@@ -1,0 +1,23 @@
+{
+  "pre_registered_hypothesis": "1 - beta2* = k * (1 + delta) / C (predicted log-log slope in [-1.2, -0.8])",
+  "observed_ols_slope": -3.7780068447038913,
+  "ols_slope_95_ci": [
+    -5.374821803153717,
+    -2.181191886254066
+  ],
+  "ols_intercept": 7.6130412942244945,
+  "ols_r2": 0.8775732817096601,
+  "ols_stderr": 0.8147015094131762,
+  "pre_registered_verdict": "REFUTED_STEEPER_SLOPE",
+  "verdict_explanation": "The deterministic scaling slope of -2.325 indicates that Adam's vulnerability grows even faster than linearly with C, because the duration of consecutive negative-gradient steps (C-1) drains the first moment negative while second moments decay.",
+  "deterministic_k_stars": {
+    "10": 10.0,
+    "30": 0.7560583216109518,
+    "100": 0.0001,
+    "300": 0.0001,
+    "1000": 0.0001
+  },
+  "saturation_verdict": "MOSTLY_CONSISTENT",
+  "collapse_metric_mse": 0.03471215221069589,
+  "collapse_metric_r2": 0.018686033250326473
+}
