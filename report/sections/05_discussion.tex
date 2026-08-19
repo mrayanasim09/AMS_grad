@@ -1,0 +1,24 @@
+\section{Discussion, Practical Implications \& Limitations}
+\label{sec:discussion}
+
+\subsection{Theoretical Guarantees vs. Empirical Conservatism}
+Our reproduction confirms that \textsc{AMSGrad} successfully rectifies \textsc{Adam}'s theoretical failure mode: by ensuring $\hat{v}_t \ge \hat{v}_{t-1}$, \textsc{AMSGrad} preserves positive semi-definiteness $\Gamma_t \succeq 0$ and guarantees sublinear regret $\mathcal{O}(\sqrt{T})$.
+
+However, our extensive grid sweeps also illuminate why \textsc{AMSGrad} does not consistently outperform \textsc{Adam} on real-world deep neural network architectures:
+\begin{enumerate}
+    \item \textbf{Historical Max Locking:} Because $\hat{v}_t$ can never decrease, a single noisy or outlier gradient burst encountered early during training permanently locks the effective denominator to a high value. This effectively depresses future learning rates along that coordinate, leading to sluggish convergence in non-stationary loss landscapes.
+    \item \textbf{Travel-Time Limitations at Large $C$:} While \textsc{AMSGrad} is certified non-divergent everywhere, its displacement rate scales inversely with $\sqrt{\hat{v}} \approx C$. Under sparse bursts ($C=1000$), \textsc{AMSGrad} requires substantially more iterations to traverse large parameter distances compared to adaptive methods that allow second moments to adapt dynamically.
+\end{enumerate}
+
+\subsection{Stochastic Drift vs. Noise Floor}
+Our analysis of the stochastic counterexample demonstrates a fundamental signal-to-noise ratio (SNR) boundary:
+\begin{equation}
+    \text{SNR} \approx \frac{\text{Drift}}{\text{Noise}} \propto \frac{\alpha \delta T}{\sqrt{\hat{v}}} \Bigg/ \frac{\alpha \sigma_m \sqrt{T/\tau_1}}{\sqrt{\hat{v}}} = \delta \sqrt{T \tau_1}.
+\end{equation}
+When the expected drift $\delta$ is very small ($\delta \le 0.01$) on finite horizons $T$, stochastic diffusion dominates, causing individual seeds to undergo significant Brownian excursions. Raising $\delta$ to $0.10$ raises the drift above the noise floor, revealing the true deterministic divergence mechanism without stochastic obscuration.
+
+\subsection{First-Moment Interactions (\texorpdfstring{$C = 10$}{C = 10} Coupling)}
+In the small-$C$ column ($C=10$), the first-moment memory horizon $\tau_1 = \frac{1}{1-\beta_1} = 10$ is exactly equal to the cycle length $C$. Consequently, $m_t$ does not fully saturate to $-1$ before the next positive burst arrives. This produces a protective filtering effect that prevents \textsc{Adam} from diverging even when $\beta_2$ is moderately low ($\beta_2 = 0.80$). This finding demonstrates that first- and second-moment exponential moving averages interact non-linearly to govern optimization stability.
+
+\subsection{Conclusion}
+In this study, we presented an end-to-end, reproducible investigation of the \textsc{Adam} $\to$ \textsc{AMSGrad} transition. We successfully reconstructed both the deterministic and stochastic counterexamples of \citet{reddi2018convergence}, established direct visual tracking of the $\Gamma_t \succeq 0$ OCO breakdown, and performed a pre-registered phase-boundary analysis across $(\beta_2, C)$ space. Our findings demonstrate that \textsc{Adam}'s divergence vulnerability scales super-linearly with burst sparsity, and that while \textsc{AMSGrad}'s monotonic second moment strictly resolves the theoretical flaw, its non-decreasing accumulator induces practical conservatism in non-stationary optimization.

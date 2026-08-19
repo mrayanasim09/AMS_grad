@@ -1,0 +1,74 @@
+\section{Theoretical Background \& Derivations}
+\label{sec:theory}
+
+\subsection{Online Convex Optimization Framework}
+Let $\mathcal{F} \subset \mathbb{R}^d$ be a compact convex feasible set with $\ell_\infty$ diameter $D_\infty = \sup_{x, y \in \mathcal{F}} \|x - y\|_\infty$. In the Online Convex Optimization (OCO) setting \citep{hazan2016introduction}, an algorithm selects a parameter vector $x_t \in \mathcal{F}$ at round $t \in [1, T]$, after which an adversary reveals a convex cost function $f_t: \mathcal{F} \to \mathbb{R}$. The performance of the algorithm is evaluated by its cumulative regret with respect to the best static comparator $x^* \in \mathcal{F}$ in hindsight:
+\begin{equation}
+    R_T = \sum_{t=1}^T \left(f_t(x_t) - f_t(x^*)\right) \le \sum_{t=1}^T \langle g_t, x_t - x^* \rangle,
+    \label{eq:regret_def}
+\end{equation}
+where $g_t = \nabla f_t(x_t)$ is the subgradient at round $t$. A sublinear regret bound, $R_T = o(T)$, guarantees convergence of the average regret $\lim_{T \to \infty} R_T / T = 0$.
+
+\subsection{Adam and Step-Dependent Bias Correction}
+\textsc{Adam} \citep{kingma2014adam} maintains exponential moving averages of both the gradient and its element-wise square:
+\begin{align}
+    m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t, \label{eq:m_t} \\
+    v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2, \label{eq:v_t}
+\end{align}
+with initializations $m_0 = \mathbf{0}$ and $v_0 = \mathbf{0}$. Unrolling the recursion for $v_t$ yields:
+\begin{equation}
+    v_t = (1 - \beta_2) \sum_{i=1}^t \beta_2^{t-i} g_i^2.
+\end{equation}
+Under the assumption that the true second moment $\mathbb{E}[g_i^2]$ is stationary across recent iterations, taking expectations gives:
+\begin{equation}
+    \mathbb{E}[v_t] = \mathbb{E}[g_t^2] (1 - \beta_2) \sum_{i=1}^t \beta_2^{t-i} = \mathbb{E}[g_t^2] (1 - \beta_2^t).
+\end{equation}
+To eliminate the bias towards zero at early steps $t$, \citet{kingma2014adam} rescale the raw moments:
+\begin{equation}
+    \tilde{m}_t = \frac{m_t}{1 - \beta_1^t}, \qquad \tilde{v}_t = \frac{v_t}{1 - \beta_2^t}.
+\end{equation}
+Parameters are subsequently updated using the projected coordinate rule:
+\begin{equation}
+    x_{t+1} = \Pi_{\mathcal{F}}\left( x_t - \frac{\alpha_t}{\sqrt{\tilde{v}_t} + \epsilon} \tilde{m}_t \right),
+    \label{eq:adam_update}
+\end{equation}
+where $\epsilon > 0$ ensures numerical stability outside the square root.
+
+\subsection{The Breakdown of the Telescoping Sum ($\Gamma_t \not\succeq 0$)}
+In standard generic adaptive gradient updates, the step is framed as a proximal projection under a dynamic metric matrix $V_t = \text{diag}(\sqrt{v_t}) / \alpha_t$:
+\begin{equation}
+    x_{t+1} = \arg\min_{x \in \mathcal{F}} \left\| x - \left(x_t - V_t^{-1} g_t\right) \right\|_{V_t}^2.
+\end{equation}
+Applying standard non-expansiveness properties of the projection under inner product $\langle u, w \rangle_{V_t} = u^\top V_t w$:
+\begin{equation}
+    \| x_{t+1} - x^* \|_{V_t}^2 \le \| x_t - x^* \|_{V_t}^2 - 2 \langle g_t, x_t - x^* \rangle + \| g_t \|_{V_t^{-1}}^2.
+\end{equation}
+Rearranging and summing from $t=1$ to $T$ yields:
+\begin{equation}
+    \sum_{t=1}^T \langle g_t, x_t - x^* \rangle \le \frac{1}{2} \| x_1 - x^* \|_{V_1}^2 + \frac{1}{2} \sum_{t=2}^T \langle x_t - x^*, \Gamma_t (x_t - x^*) \rangle + \frac{1}{2} \sum_{t=1}^T \| g_t \|_{V_t^{-1}}^2,
+    \label{eq:telescoping_sum}
+\end{equation}
+where the differential metric matrix $\Gamma_t$ is defined as:
+\begin{equation}
+    \Gamma_t \triangleq V_t - V_{t-1} = \frac{\text{diag}(\sqrt{v_t})}{\alpha_t} - \frac{\text{diag}(\sqrt{v_{t-1}})}{\alpha_{t-1}}.
+    \label{eq:gamma_def}
+\end{equation}
+In algorithms like \textsc{AdaGrad}, the accumulator $G_t = G_{t-1} + g_t^2$ is monotonically non-decreasing, and with non-increasing step sizes $\alpha_t \le \alpha_{t-1}$, $\Gamma_t \succeq 0$ holds unconditionally. Under positive semi-definiteness, the cross-term in Eq.~\eqref{eq:telescoping_sum} cleanly telescopes:
+\begin{equation}
+    \sum_{t=2}^T \langle x_t - x^*, \Gamma_t (x_t - x^*) \rangle \le D_\infty^2 \sum_{t=2}^T \text{Tr}(\Gamma_t) = D_\infty^2 \text{Tr}(V_T - V_1).
+\end{equation}
+\textbf{The Fatal Flaw in \textsc{Adam}:} Because \textsc{Adam} computes $v_t$ via an exponential moving average, $v_t$ can shrink whenever a large gradient is followed by smaller gradients. When $v_t < v_{t-1}$, $\Gamma_t$ has negative diagonal entries. Because $(x_t - x^*)^2$ is positive, negative entries in $\Gamma_t$ destroy the upper bound, causing the sum in Eq.~\eqref{eq:telescoping_sum} to accumulate linear positive regret $\Omega(T)$.
+
+\subsection{The AMSGrad Resolution}
+\citet{reddi2018convergence} proved that convergence is restored if the effective second moment is guaranteed to be coordinate-wise non-decreasing. \textsc{AMSGrad} enforces this via the running maximum:
+\begin{equation}
+    \hat{v}_t = \max\left(\hat{v}_{t-1}, v_t\right), \qquad \hat{v}_0 = \mathbf{0}.
+    \label{eq:amsgrad_max}
+\end{equation}
+Since $\hat{v}_t \ge \hat{v}_{t-1}$, for any non-increasing step-size schedule $\alpha_t = \frac{\alpha}{\sqrt{t}}$:
+\begin{equation}
+    \Gamma_t = \frac{\sqrt{\hat{v}_t}}{\alpha_t} - \frac{\sqrt{\hat{v}_{t-1}}}{\alpha_{t-1}} \succeq 0 \quad \forall t \ge 1.
+\end{equation}
+This restores valid telescoping and proves an optimal $\mathcal{O}(\sqrt{T})$ regret bound for arbitrary convex function sequences.
+
+\paragraph{Theory vs. Practice Step-Size Gap.} The theoretical regret bound of \textsc{AMSGrad} requires $\alpha_t = \frac{\alpha}{\sqrt{t}}$. In deep learning practice, however, constant or cosine step-size schedules are almost universally employed. Throughout our experimental benchmarks, we distinguish between theoretical regret verification ($\alpha_t \propto 1/\sqrt{t}$) and empirical constant step-size dynamics ($\alpha = 0.8$).
