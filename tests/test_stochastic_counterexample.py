@@ -1,6 +1,7 @@
 """
 Stochastic Counterexample Tests (Section 3 setting).
 Evaluates Adam divergence and AMSGrad/AdaGrad non-divergence across seeds.
+Includes statistical self-test for the stochastic gradient generator.
 """
 
 import pytest
@@ -23,6 +24,39 @@ STOCHASTIC_TEST_CONFIG = {
     "n_seeds": 50,
     "base_seed": 42,
 }
+
+
+def test_stochastic_environment_statistics():
+    """Verify stochastic environment draws are unbiased (E[g] within 3-sigma) and seeds are independent."""
+    cfg = STOCHASTIC_TEST_CONFIG
+    n_seeds = 50
+    n_steps = 2000  # Total 100,000 draws
+    env = StochasticCounterexample(
+        C=cfg["C"],
+        delta=cfg["delta"],
+        n_seeds=n_seeds,
+        base_seed=cfg["base_seed"],
+    )
+    
+    draws = np.array([env.get_gradient(t)[:, 0] for t in range(1, n_steps + 1)])  # (2000, 50)
+    empirical_mean = float(np.mean(draws))
+    
+    p = (1.0 + cfg["delta"]) / (cfg["C"] + 1.0)
+    theo_var = p * (cfg["C"] ** 2) + (1.0 - p) * 1.0 - (cfg["delta"] ** 2)
+    std_err = np.sqrt(theo_var / draws.size)
+    
+    # 3-sigma gate
+    assert abs(empirical_mean - cfg["delta"]) <= 3.0 * std_err, (
+        f"Empirical E[g] = {empirical_mean:.4f} outside 3-sigma [{cfg['delta'] - 3*std_err:.4f}, {cfg['delta'] + 3*std_err:.4f}]"
+    )
+    
+    # Pairwise cross-correlation check across seeds
+    corrs = []
+    for i in range(min(10, n_seeds)):
+        for j in range(i + 1, min(10, n_seeds)):
+            c = np.corrcoef(draws[:, i], draws[:, j])[0, 1]
+            corrs.append(c)
+    assert np.max(np.abs(corrs)) < 0.10, f"Seed cross-correlation too high: {np.max(np.abs(corrs)):.4f}"
 
 
 def run_stochastic(optimizer_cls, opt_kwargs):

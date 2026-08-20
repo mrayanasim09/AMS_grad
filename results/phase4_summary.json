@@ -4,42 +4,44 @@
     "results/deterministic_boundary_cycle_metric.csv",
     "results/mechanism_probes/p1_beta2_sweep.csv",
     "results/mechanism_probes/p2_alpha_sweep.csv",
+    "results/mechanism_probes/alpha_star_bisection.csv",
     "results/mechanism_probes/lambda_regret_slopes.json"
   ],
   "measurement_metric": "cycle_averaged_x_bar = mean(x_t over final C steps)",
   "pre_registered_hypothesis": "1 - beta2* = k*(1+delta)/C, log-log slope in [-1.2, -0.8]",
   "pre_registered_verdict": "REFUTED",
-  "verdict_explanation": "Boundary disappears at large C (unconditional failure): two-regime finding. (i) Small-C regime (C=10): Adam survives all beta2 in [0.05,1). (ii) Intermediate-C regime (C=30): unique bracket at k*=0.300, beta2*=0.990. (iii) Large-C regime (C>=100): boundary ceases to exist - Adam fails unconditionally across all probed beta2.",
+  "verdict_explanation": "Boundary disappears at large C (unconditional failure): two-regime finding. (i) Small-C regime (C=10): Mixed behavior (survives for beta2 >= 0.8, fails at beta2=0.5 with x_bar=+0.807). (ii) Intermediate-C regime (C=30): unique bracket at k*=0.300, beta2*=0.990. (iii) Large-C regime (C>=100): boundary ceases to exist - Adam fails unconditionally across all probed beta2 in [0.05, 1-1e-6].",
   "boundary_by_C": {
     "10": {
-      "status": "always_survives_no_boundary",
+      "status": "mixed_no_clean_bracket",
       "k_star": null,
       "beta2_star": null,
-      "note": "Survives all beta2 (cycle mean < 0 for entire probed range)"
+      "note": "Survives at high beta2 (>=0.8), fails at beta2=0.5 (x_bar=+0.807)"
     },
     "30": {
       "status": "genuine_bracket",
       "k_star": 0.2997722184024957,
       "beta2_star": 0.9900075927199168,
+      "half_interval": 0.000053,
       "note": "Genuine sign-change bracket"
     },
     "100": {
       "status": "always_fails_no_boundary",
       "k_star": null,
       "beta2_star": null,
-      "note": "Fails across all beta2 >= 0.05"
+      "note": "Fails across all beta2 in [0.05, 1-1e-6]"
     },
     "300": {
       "status": "always_fails_no_boundary",
       "k_star": null,
       "beta2_star": null,
-      "note": "Fails across all beta2 >= 0.05"
+      "note": "Fails across all beta2 in [0.05, 1-1e-6]"
     },
     "1000": {
       "status": "always_fails_no_boundary",
       "k_star": null,
       "beta2_star": null,
-      "note": "Fails across all beta2 >= 0.05"
+      "note": "Fails across all beta2 in [0.05, 1-1e-6]"
     }
   },
   "mechanism_discrimination": {
@@ -48,11 +50,11 @@
       "source": "results/mechanism_probes/p1_beta2_sweep.csv"
     },
     "probe_P2_alpha_threshold": {
-      "finding": "At C=100, beta2=0.999: survival at alpha=0.30 (cycle_mean=-0.180), failure at alpha=0.20 and alpha=0.80. Traverse condition alpha*(C - s*) >~ 2*sqrt(C) with s*=23. At beta2=0.9 (v-collapse regime): fails at all alpha including 0.10.",
+      "finding": "At C=100, beta2=0.999: survival at alpha in [0.26, 0.45] (cycle_mean < 0), failure above and below. Traverse threshold alpha* = 0.251 matches prediction 2*sqrt(C)/(C - s*) = 0.263 within 5%. At beta2=0.9 (v-collapse regime): fails at all alpha including 0.10.",
       "source": "results/mechanism_probes/p2_alpha_sweep.csv"
     },
     "probe_P3_single_cycle_trace": {
-      "finding": "Post-burst, m_tilde starts at +(1-beta1)*C = 10 and crosses zero at s* ~ tau1*ln((1-beta1)*C+1) ~ 23 steps. Protected window: steps 1-23 retract toward -1. Steps 24-100 accumulate positive drift. Dwell fraction = 0.50 (full-interval sweep, not pinning at +1).",
+      "finding": "Post-burst, m_tilde starts at +(1-beta1)*C = 10 and crosses zero at s* ~ tau1*ln((1-beta1)*C+1) ~ 24 steps. Protected window: steps 1-24 retract toward -1. Steps 25-100 accumulate positive drift. Dwell fraction = 0.50 (full-interval sweep, not pinning at +1).",
       "source": "results/mechanism_probes/p3_single_cycle_trace.pdf"
     }
   },
@@ -62,9 +64,9 @@
       "AMSGrad (raw)": 1.3069096715070807,
       "AdaGrad": 1.419674632922593
     },
-    "caveat": "All three optimizers use constant alpha=0.8, which violates the decreasing step-size conditions of all three regret theorems. Lambda values are empirical descriptors only; do not interpret as theoretical convergence rate comparisons."
+    "caveat": "All three optimizers use constant alpha=0.8, which violates the decreasing step-size conditions of all three regret theorems. Apparent lambda > 1 values are finite-window offset artifacts; asymptotic regret is mathematically bounded by O(T)."
   },
-  "stochastic_boundary_C=30_k_star": {
+  "deterministic_boundary_C=30_k_star": {
     "k_star": 0.2997722184024957,
     "beta2_star": 0.9900075927199168,
     "x_bar_low_k": -0.5142174782794752,

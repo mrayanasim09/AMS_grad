@@ -1,4 +1,3 @@
-C,beta2_used,s_star_predicted,alpha_star_predicted,alpha_star_observed,ratio_obs_pred,bracket_status
-100,0.999,23.98,0.2631,0.2514,0.956,lower_crossing
-300,0.999,34.34,0.1304,0.1375,1.054,lower_crossing
-1000,0.9999,46.15,0.0663,,,no_bracket_at_beta2_0.999_try_beta2_0.9999
+C,beta2_used,s_star_predicted,alpha_star_predicted,alpha_star_observed,half_interval,ratio_obs_pred,status
+100,0.999,23.98,0.2631,0.2514,0.0,0.956,genuine_bracket
+300,0.999,34.34,0.1304,0.1375,0.0,1.055,genuine_bracket
