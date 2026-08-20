@@ -13,7 +13,7 @@ with a slight negative tilt (theoretical mean approx -0.08, matching observed -0
 Therefore, absolute convergence to x* = -1 is mathematically impossible under constant alpha;
 rigorous O(sqrt(T)) sublinear regret and concentration at x* = -1 require decreasing step sizes
 alpha_t = alpha / sqrt(t). Under decreasing step sizes, AMSGrad strongly concentrates at -1
-(mean < -0.95), while Adam diverges to +1 via the second-moment v-collapse ratchet.
+(mean < -0.90), while Adam diverges to +1 via the second-moment v-collapse ratchet.
 """
 
 import pytest
@@ -83,11 +83,11 @@ def test_stochastic_environment_statistics(request):
             cross_corrs.append(c)
     max_cross_corr = float(np.max(np.abs(cross_corrs)))
 
-    # Record margins
-    request.node.record_margin("E[g] within 3-sigma", 3.0 * std_err_mean - abs(empirical_mean - theo_mean), 0.0, ">=")
-    request.node.record_margin("E[g^2] within 3-sigma", 3.0 * std_err_sq - abs(empirical_mean_sq - theo_mean_sq), 0.0, ">=")
-    request.node.record_margin("Lag-1 autocorrelation |rho_1| < 0.05", 0.05 - abs(mean_autocorr), 0.0, ">=")
-    request.node.record_margin("Seed independence max|corr| < 0.10", 0.10 - max_cross_corr, 0.0, ">=")
+    # Record margins with true actual values
+    request.node.record_margin("E[g] within 3-sigma", empirical_mean, (theo_mean, 3.0 * std_err_mean), "within_3sigma")
+    request.node.record_margin("E[g^2] within 3-sigma", empirical_mean_sq, (theo_mean_sq, 3.0 * std_err_sq), "within_3sigma")
+    request.node.record_margin("Lag-1 autocorrelation |rho_1| < 0.05", abs(mean_autocorr), 0.05, "<")
+    request.node.record_margin("Seed independence max|corr| < 0.10", max_cross_corr, 0.10, "<")
 
     assert abs(empirical_mean - theo_mean) <= 3.0 * std_err_mean, (
         f"Empirical E[g] = {empirical_mean:.4f} outside 3-sigma [{theo_mean - 3*std_err_mean:.4f}, {theo_mean + 3*std_err_mean:.4f}]"
@@ -148,7 +148,7 @@ def test_stochastic_constant_alpha_separation(request):
 
     request.node.record_margin("Adam - AMSGrad separation > 0.20", separation, 0.20, ">")
     request.node.record_margin("Adam positive drift mean > 0.10", mean_adam, 0.10, ">")
-    request.node.record_margin("AMSGrad mean < 0.05", 0.05, mean_ams, ">")
+    request.node.record_margin("AMSGrad mean < 0.05", mean_ams, 0.05, "<")
     request.node.record_margin("Failure fraction difference > 0.15", frac_adam_pos - frac_ams_pos, 0.15, ">")
 
     assert separation > 0.20, f"Separation between Adam and AMSGrad insufficient: {separation:.4f} (Adam={mean_adam:+.4f}, AMSGrad={mean_ams:+.4f})"
@@ -200,7 +200,7 @@ def test_amsgrad_decreasing_alpha_convergence(request):
     frac_ams_conv = float(np.mean(x_ams < -0.90))
     mean_adam = float(np.mean(x_adam))
 
-    request.node.record_margin("AMSGrad decreasing mean < -0.90", -0.90 - mean_ams, 0.0, ">=")
+    request.node.record_margin("AMSGrad decreasing mean < -0.90", mean_ams, -0.90, "<")
     request.node.record_margin("AMSGrad fraction < -0.90 >= 0.90", frac_ams_conv, 0.90, ">=")
     request.node.record_margin("Adam decreasing mean > 0.50", mean_adam, 0.50, ">=")
 
@@ -223,7 +223,7 @@ def test_adagrad_stochastic_convergence(request):
     mean_ada = float(np.mean(x_ada))
     frac_neg = float(np.mean(x_ada < 0.0))
 
-    request.node.record_margin("AdaGrad mean < -0.30", -0.30 - mean_ada, 0.0, ">=")
+    request.node.record_margin("AdaGrad mean < -0.30", mean_ada, -0.30, "<")
     request.node.record_margin("AdaGrad negative fraction >= 0.75", frac_neg, 0.75, ">=")
 
     assert mean_ada < -0.30, f"AdaGrad stochastic convergence too weak: mean(x_T) = {mean_ada:+.4f}"
