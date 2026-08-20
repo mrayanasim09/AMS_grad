@@ -1,23 +1,74 @@
 {
-  "pre_registered_hypothesis": "1 - beta2* = k * (1 + delta) / C (predicted log-log slope in [-1.2, -0.8])",
-  "observed_ols_slope": -3.7780068447038913,
-  "ols_slope_95_ci": [
-    -5.374821803153717,
-    -2.181191886254066
+  "schema_version": "2.0",
+  "source_files": [
+    "results/deterministic_boundary_cycle_metric.csv",
+    "results/mechanism_probes/p1_beta2_sweep.csv",
+    "results/mechanism_probes/p2_alpha_sweep.csv",
+    "results/mechanism_probes/lambda_regret_slopes.json"
   ],
-  "ols_intercept": 7.6130412942244945,
-  "ols_r2": 0.8775732817096601,
-  "ols_stderr": 0.8147015094131762,
-  "pre_registered_verdict": "REFUTED_STEEPER_SLOPE",
-  "verdict_explanation": "The deterministic scaling slope of -2.325 indicates that Adam's vulnerability grows even faster than linearly with C, because the duration of consecutive negative-gradient steps (C-1) drains the first moment negative while second moments decay.",
-  "deterministic_k_stars": {
-    "10": 10.0,
-    "30": 0.7560583216109518,
-    "100": 0.0001,
-    "300": 0.0001,
-    "1000": 0.0001
+  "measurement_metric": "cycle_averaged_x_bar = mean(x_t over final C steps)",
+  "pre_registered_hypothesis": "1 - beta2* = k*(1+delta)/C, log-log slope in [-1.2, -0.8]",
+  "pre_registered_verdict": "REFUTED",
+  "verdict_explanation": "Boundary disappears at large C (unconditional failure): two-regime finding. (i) Small-C regime (C=10): Adam survives all beta2 in [0.05,1). (ii) Intermediate-C regime (C=30): unique bracket at k*=0.300, beta2*=0.990. (iii) Large-C regime (C>=100): boundary ceases to exist - Adam fails unconditionally across all probed beta2.",
+  "boundary_by_C": {
+    "10": {
+      "status": "always_survives_no_boundary",
+      "k_star": null,
+      "beta2_star": null,
+      "note": "Survives all beta2 (cycle mean < 0 for entire probed range)"
+    },
+    "30": {
+      "status": "genuine_bracket",
+      "k_star": 0.2997722184024957,
+      "beta2_star": 0.9900075927199168,
+      "note": "Genuine sign-change bracket"
+    },
+    "100": {
+      "status": "always_fails_no_boundary",
+      "k_star": null,
+      "beta2_star": null,
+      "note": "Fails across all beta2 >= 0.05"
+    },
+    "300": {
+      "status": "always_fails_no_boundary",
+      "k_star": null,
+      "beta2_star": null,
+      "note": "Fails across all beta2 >= 0.05"
+    },
+    "1000": {
+      "status": "always_fails_no_boundary",
+      "k_star": null,
+      "beta2_star": null,
+      "note": "Fails across all beta2 >= 0.05"
+    }
   },
-  "saturation_verdict": "MOSTLY_CONSISTENT",
-  "collapse_metric_mse": 0.03471215221069589,
-  "collapse_metric_r2": 0.018686033250326473
+  "mechanism_discrimination": {
+    "probe_P1_beta2_independence": {
+      "finding": "At C=100, cycle_mean is constant at +0.173 for beta2 in [0.99, 1-1e-6] (tau2 = 100 to 1e6). Second-moment memory horizon is detached from divergence threshold.",
+      "source": "results/mechanism_probes/p1_beta2_sweep.csv"
+    },
+    "probe_P2_alpha_threshold": {
+      "finding": "At C=100, beta2=0.999: survival at alpha=0.30 (cycle_mean=-0.180), failure at alpha=0.20 and alpha=0.80. Traverse condition alpha*(C - s*) >~ 2*sqrt(C) with s*=23. At beta2=0.9 (v-collapse regime): fails at all alpha including 0.10.",
+      "source": "results/mechanism_probes/p2_alpha_sweep.csv"
+    },
+    "probe_P3_single_cycle_trace": {
+      "finding": "Post-burst, m_tilde starts at +(1-beta1)*C = 10 and crosses zero at s* ~ tau1*ln((1-beta1)*C+1) ~ 23 steps. Protected window: steps 1-23 retract toward -1. Steps 24-100 accumulate positive drift. Dwell fraction = 0.50 (full-interval sweep, not pinning at +1).",
+      "source": "results/mechanism_probes/p3_single_cycle_trace.pdf"
+    }
+  },
+  "regret_exponents_lambda_constant_alpha": {
+    "values": {
+      "Adam (beta2=0.5)": 1.2274853774811696,
+      "AMSGrad (raw)": 1.3069096715070807,
+      "AdaGrad": 1.419674632922593
+    },
+    "caveat": "All three optimizers use constant alpha=0.8, which violates the decreasing step-size conditions of all three regret theorems. Lambda values are empirical descriptors only; do not interpret as theoretical convergence rate comparisons."
+  },
+  "stochastic_boundary_C=30_k_star": {
+    "k_star": 0.2997722184024957,
+    "beta2_star": 0.9900075927199168,
+    "x_bar_low_k": -0.5142174782794752,
+    "x_bar_high_k": 0.602781611147506,
+    "source": "results/deterministic_boundary_cycle_metric.csv"
+  }
 }

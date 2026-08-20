@@ -1,24 +1,23 @@
 \section{Discussion, Practical Implications \& Limitations}
 \label{sec:discussion}
 
-\subsection{Theoretical Guarantees vs. Practical Conservatism}
-Our reproduction confirms that \textsc{AMSGrad} successfully rectifies \textsc{Adam}'s theoretical failure mode: by ensuring $\hat{v}_t \ge \hat{v}_{t-1}$, \textsc{AMSGrad} preserves positive semi-definiteness $\Gamma_t \succeq 0$ and guarantees sublinear regret $\mathcal{O}(\sqrt{T})$.
-
-However, our mechanism discrimination probes illuminate why \textsc{AMSGrad} does not consistently outperform \textsc{Adam} on real-world deep neural network architectures:
+\subsection{Two-Regime Summary}
+Our mechanism discrimination experiments reveal two structurally distinct divergence regimes at large gradient burst spacing:
 \begin{enumerate}
-    \item \textbf{Historical Max Locking:} Because $\hat{v}_t$ can never decrease, a single noisy or outlier gradient burst encountered early during training permanently locks the effective denominator to a high value. This effectively depresses future learning rates along that coordinate, leading to sluggish convergence in non-stationary loss landscapes.
-    \item \textbf{Travel-Time Limitations at Large $C$:} While \textsc{AMSGrad} and \textsc{AdaGrad} are certified non-divergent everywhere, their displacement rate scales inversely with $\sqrt{\hat{v}} \approx C$. Under sparse bursts ($C=1000$), \textsc{AMSGrad} requires substantially more iterations to traverse large parameter distances compared to adaptive methods that allow second moments to adapt dynamically.
+    \item \textbf{Regime I (v-Collapse, $\tau_2 \lesssim T_{\text{burst}}$):} The second-moment estimate decays between bursts, amplifying the effective learning rate on non-burst steps. This regime fails unconditionally for all learning rates $\alpha$ tested (Probe P2, $\beta_2 = 0.9$ column, $C=100$). The fix (\textsc{AMSGrad}) is precisely targeted at this regime.
+    \item \textbf{Regime II (Post-Burst Drift, $\tau_2 \gg T_{\text{burst}}$):} With high $\beta_2$, $v_t$ remains approximately constant. Failure is governed by the traverse condition $\alpha(C - s^*(C)) \gtrsim 2\sqrt{C}$, where $s^*(C) = \tau_1 \ln((1-\beta_1)C+1)$ is the protected window during which the first moment $\tilde{m}_t$ remains positive after a burst. At $C=100$, the predicted threshold $\alpha^*=0.263$ matches the empirically bisected boundary $\alpha^*=0.251$ to within $5\%$.
 \end{enumerate}
 
-\subsection{Stochastic Drift vs. Noise Floor}
-Our analysis of the stochastic counterexample demonstrates a fundamental signal-to-noise ratio (SNR) boundary:
-\begin{equation}
-    \text{SNR} \approx \frac{\text{Drift}}{\text{Noise}} \propto \frac{\alpha \delta T}{\sqrt{\hat{v}}} \Bigg/ \frac{\alpha \sigma_m \sqrt{T/\tau_1}}{\sqrt{\hat{v}}} = \delta \sqrt{T \tau_1}.
-\end{equation}
-When the expected drift $\delta$ is very small ($\delta \le 0.01$) on finite horizons $T$, stochastic diffusion dominates, causing individual seeds to undergo significant Brownian excursions. Raising $\delta$ to $0.10$ raises the drift above the noise floor, revealing the true deterministic divergence mechanism without stochastic obscuration.
+\subsection{Practical Conservatism of AMSGrad}
+\textsc{AMSGrad} successfully resolves Regime I by enforcing $\hat{v}_t \ge \hat{v}_{t-1}$. This guarantees $\Gamma_t \succeq 0$ and restores sublinear regret $\mathcal{O}(\sqrt{T})$ under decreasing step sizes. However, in non-stationary deep learning settings, the historical maximum $\hat{v}_t$ can be locked by a single early outlier gradient burst, depressing future coordinate-wise learning rates and inducing practical sluggishness.
 
-\subsection{First-Moment Interactions (\texorpdfstring{$C = 10$}{C = 10} Coupling)}
-In the small-$C$ column ($C=10$), the first-moment memory horizon $\tau_1 = \frac{1}{1-\beta_1} = 10$ is exactly equal to the cycle length $C$. Consequently, $m_t$ does not fully saturate to $-1$ before the next positive burst arrives. This produces a protective filtering effect that prevents \textsc{Adam} from diverging even when $\beta_2$ is moderately low ($\beta_2 = 0.80$). This finding demonstrates that first- and second-moment exponential moving averages interact non-linearly to govern optimization stability.
+\subsection{Regret Exponents Under Constant Step Size}
+We report windowed log-log regret slopes $\lambda$ over $t \in [0.1T, T]$ for all three optimizers on the stochastic benchmark ($C=20, \delta=0.05$, $\alpha=0.8$ constant; source: \texttt{results/mechanism\_probes/lambda\_regret\_slopes.json}). \emph{Caveat:} A constant step size $\alpha$ violates the required step-decay conditions of all three regret theorems (\textsc{Adam}, \textsc{AMSGrad}, \textsc{AdaGrad} all require $\alpha_t \to 0$). The reported $\lambda$ values are purely empirical descriptors of finite-time behaviour and must not be interpreted as theoretical convergence rate comparisons or as evidence for one optimizer having ``worse regret'' than another.
 
 \subsection{Conclusion}
-In this study, we presented an end-to-end, reproducible investigation of the \textsc{Adam} $\to$ \textsc{AMSGrad} transition. We successfully reconstructed both the deterministic and stochastic counterexamples of \citet{reddi2018convergence}, established direct visual tracking of the $\Gamma_t \succeq 0$ OCO breakdown, and performed a pre-registered phase-boundary analysis across $(\beta_2, C)$ space. Our findings refute the simple $C^{-1}$ memory-horizon scaling law, revealing that for large burst spacing ($C \ge 100$), \textsc{Adam}'s divergence becomes $\beta_2$-independent and is driven by post-burst first-moment drift.
+In this work, we presented a complete, reproducible replication of the \textsc{Adam} $\to$ \textsc{AMSGrad} transition and a pre-registered parametric extension. Our primary findings are:
+\begin{enumerate}
+    \item \textbf{Exact Counterexample Reproduction:} Both deterministic and stochastic Reddi et al.\ counterexamples are reproduced, with live $\Gamma_t$ tracking visually confirming the OCO semi-definiteness breakdown.
+    \item \textbf{Boundary Disappearance:} Under rigorous cycle-averaged metrics, the divergence boundary exists only at $C=30$ ($k^* = 0.300, \beta_2^* = 0.990$). For $C \ge 100$, \textsc{Adam} fails unconditionally across all $\beta_2$, refuting the pre-registered $C^{-1}$ scaling law.
+    \item \textbf{Two-Regime Mechanism:} v-collapse drives failure at low $\tau_2$; post-burst first-moment drift governs failure at large $\tau_2$. The traverse threshold $\alpha^*(C) = 2\sqrt{C}/(C - s^*(C))$ is quantitatively validated at $C=100$.
+\end{enumerate}
