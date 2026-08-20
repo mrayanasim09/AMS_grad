@@ -18,8 +18,10 @@ All experiments are implemented from scratch in pure NumPy and executed in a ded
 Deterministic (Adam Fail) & $10$ & $500$ & $0.8$ & $0.9$ & $0.5$ & --- \\
 Deterministic (Adam Control) & $10$ & $500$ & $0.8$ & $0.9$ & $0.999$ & --- \\
 Deterministic (AMSGrad / AdaGrad) & $10$ & $500$ & $0.8$ & $0.9$ & $0.5$ & --- \\
-Stochastic Replication & $20$ & $3000$ & $0.8$ & $0.9$ & $0.5$ & $0.05$ \\
-Stochastic CI Test Suite ($N=50$) & $20$ & $5000$ & $0.8$ & $0.9$ & $0.5$ & $0.10$ \\
+Stochastic Replication ($N=30$) & $20$ & $3000$ & $0.8$ & $0.9$ & $0.5$ & $0.05$ \\
+Stochastic CI Test Suite ($N=200$) & $20$ & $5000$ & $0.8$ & $0.9$ & $0.5$ & $0.10$ \\
+Stochastic Theory Resolution ($N=100$) & $20$ & $5000$ & $\{0.8,\, 0.8/\sqrt{t}\}$ & $0.9$ & $0.5$ & $0.50$ \\
+Stochastic Robustness Check ($N=20$) & $20$ & $10^6$ & $0.8/\sqrt{t}$ & $0.9$ & $0.5$ & $0.10$ \\
 Phase 4 Grid Sweep ($N=100$) & $[10, 1000]$ & $50(C+1)$ & $0.8$ & $0.9$ & Swept & $0.10$ \\
 \bottomrule
 \end{tabular}
@@ -106,17 +108,22 @@ Under $\beta_2=0.5$ with constant step size $\alpha=0.8$, \textsc{Adam} exhibits
 \paragraph{Stationary Distribution Analysis under Constant Step Size.}
 The apparent lack of tight concentration for \textsc{AMSGrad} under constant $\alpha=0.8$ is not a numerical anomaly, but an exact consequence of discrete stochastic dynamics:
 \begin{enumerate}
-    \item \textbf{Momentum Noise Amplification:} First-moment filtering $m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t$ induces an AR(1) increment sequence that inflates effective noise variance by $\frac{1+\beta_1}{1-\beta_1} = 19$ (amplification $\sqrt{19} \approx 4.36$).
-    \item \textbf{Fokker-Planck Equilibrium:} With $\hat{v}_t \approx C^2 = 400$, effective drift is $\mu = -\frac{\alpha \delta}{\sqrt{\hat{v}_t}} \times T \approx -20$, while effective diffusion scale is $\sigma_{\text{eff}} \approx 13$. On the bounded interval $[-1, 1]$, the stationary density is $P(x) \propto e^{2\mu x / \sigma_{\text{eff}}^2}$. With exponent $\frac{2\mu L}{\sigma_{\text{eff}}^2} \approx 0.24$, this distribution is broad and near-uniform with a modest negative tilt (theoretical mean $\approx -0.08$, matching the observed $-0.08$ to $-0.13$).
+    \item \textbf{Momentum Noise Amplification:} First-moment filtering $m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t$ induces an AR(1) increment sequence that inflates effective noise variance by $\frac{1+\beta_1}{1-\beta_1} = 19$ (amplification factor $\sqrt{19} \approx 4.36$).
+    \item \textbf{Fokker-Planck Equilibrium:} For the baseline configuration ($C=20, \delta=0.10, T=5000, \alpha=0.8$), the maximum second-moment estimate is $\hat{v}_t \approx C^2 = 400$. The cumulative theoretical drift is:
+    \begin{equation}
+        \mu = -\frac{\alpha \delta}{\sqrt{\hat{v}_t}} \times T = -\frac{0.8 \times 0.10}{20} \times 5000 = -20.0,
+        \label{eq:drift_mu}
+    \end{equation}
+    while the cumulative diffusion variance is $\sigma_{\text{eff}}^2 = T \times \frac{\alpha^2}{\hat{v}_t} \times 19 \approx 5000 \times \frac{0.64}{400} \times 19 \approx 152$ ($\sigma_{\text{eff}} \approx 12.33$). On the bounded interval $[-1, 1]$ (length $L=1$), the continuous stationary density is $P(x) \propto e^{2\mu x / \sigma_{\text{eff}}^2}$. With exponent $\frac{2\mu L}{\sigma_{\text{eff}}^2} \approx \frac{-40}{152} \approx -0.26$, this yields a broad, near-uniform distribution with a modest negative tilt (theoretical mean $\approx -0.08$, matching the observed $-0.08$ to $-0.13$).
     \item \textbf{AdaGrad Concentration:} Because \textsc{AdaGrad} lacks momentum ($\beta_1=0$), it experiences no $\sqrt{19}$ noise inflation, and its accumulator $G_t = \sum g_i^2 \approx 22t$ continuously scales step sizes as $\mathcal{O}(1/\sqrt{t})$, concentrating tightly at $\mathbb{E}[x_T] = -0.42$.
 \end{enumerate}
 
 \paragraph{Asymptotic Convergence under $\alpha_t \propto 1/\sqrt{t}$.}
-Figure~\ref{fig:stochastic_resolution} resolves the theoretical guarantee: when decreasing step sizes $\alpha_t = \frac{0.8}{\sqrt{t}}$ are applied ($C=20, \delta=0.5, T=5000, N=100$), \textsc{AMSGrad} concentrates completely at the optimal point $\mathbb{E}[x_T] = -0.988 \pm 0.031$ ($98\%$ of seeds $< -0.90$), whereas \textsc{Adam} diverges positively ($\mathbb{E}[x_T] = +0.729$). Long-horizon evaluation at $T=10^6$ ($\delta=0.10, N=20$) confirms asymptotic lock-in: \textsc{AMSGrad} achieves $\mathbb{E}[x_T] = -0.998$ while \textsc{Adam} reaches $\mathbb{E}[x_T] = +0.999$.
+Figure~\ref{fig:stochastic_resolution} validates the theoretical guarantee on the closing experiment benchmark ($C=20, \delta=0.50, T=5000, N=100$). In panel (a), under constant $\alpha=0.8$, the larger signal $\delta=0.50$ yields drift $\mu = -\frac{0.8 \times 0.50}{20} \times 5000 = -100$, producing an empirical stationary distribution with stronger negative tilt ($\mathbb{E}[x_T] = -0.634 \pm 0.537$). In panel (b), when decreasing step sizes $\alpha_t = \frac{0.8}{\sqrt{t}}$ are applied, \textsc{AMSGrad} concentrates sharply at the optimal point $\mathbb{E}[x_T] = -0.988 \pm 0.031$ ($98\%$ of seeds $< -0.90$), whereas \textsc{Adam} diverges positively ($\mathbb{E}[x_T] = +0.729$). Long-horizon evaluation at $T=10^6$ ($\delta=0.10, N=20$) confirms asymptotic lock-in: \textsc{AMSGrad} achieves $\mathbb{E}[x_T] = -0.998$ while \textsc{Adam} reaches $\mathbb{E}[x_T] = +0.999$.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.92\textwidth]{figures/stochastic_theory_resolution.pdf}
-\caption{Resolution of stochastic counterexample theory ($C=20, \beta_1=0.9, \beta_2=0.5, N=100$). (a) Under constant $\alpha=0.8$, \textsc{AMSGrad} generates a broad stationary distribution with negative tilt ($\mu=-0.63$), while \textsc{Adam} ratchets positive. (b) Under decreasing step size $\alpha_t = 0.8/\sqrt{t}$, \textsc{AMSGrad} achieves sharp asymptotic convergence to $x^*=-1$ ($\mu=-0.99$), while \textsc{Adam} converges to $+1$ ($\mu=+0.73$). (c, d) Sample trajectory realizations over $5000$ steps.}
+\caption{Resolution of stochastic counterexample theory ($C=20, \delta=0.50, T=5000, \beta_1=0.9, \beta_2=0.5, N=100$). (a) Under constant $\alpha=0.8$, \textsc{AMSGrad} generates a broad stationary distribution with negative tilt ($\mu=-0.63$), while \textsc{Adam} ratchets positive. (b) Under decreasing step size $\alpha_t = 0.8/\sqrt{t}$, \textsc{AMSGrad} achieves sharp asymptotic convergence to $x^*=-1$ ($\mu=-0.99$), while \textsc{Adam} converges to $+1$ ($\mu=+0.73$). (c, d) Sample trajectory realizations over $5000$ steps.}
 \label{fig:stochastic_resolution}
 \end{figure*}
