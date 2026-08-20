@@ -1,0 +1,86 @@
+{
+  "deterministic_cycle_boundary": [
+    {
+      "C": 10,
+      "T": 2200,
+      "k_star": NaN,
+      "k_bracket_low": NaN,
+      "k_bracket_high": NaN,
+      "beta2_star": NaN,
+      "one_minus_beta2_star": NaN,
+      "status": "always_survives_no_boundary",
+      "x_bar_low_k": -0.9486389410248932,
+      "x_bar_high_k": -0.7017322888552135,
+      "dwell_low_k": 0.0,
+      "dwell_high_k": 0.0
+    },
+    {
+      "C": 30,
+      "T": 6200,
+      "k_star": 0.29977221840249574,
+      "k_bracket_low": 0.2997195610526729,
+      "k_bracket_high": 0.2998248850036216,
+      "beta2_star": 0.9900075927199168,
+      "one_minus_beta2_star": 0.009992407280083191,
+      "status": "genuine_bracket",
+      "x_bar_low_k": -0.5142174782794752,
+      "x_bar_high_k": 0.602781611147506,
+      "dwell_low_k": 0.0,
+      "dwell_high_k": 0.6
+    },
+    {
+      "C": 100,
+      "T": 20200,
+      "k_star": NaN,
+      "k_bracket_low": NaN,
+      "k_bracket_high": NaN,
+      "beta2_star": NaN,
+      "one_minus_beta2_star": NaN,
+      "status": "always_fails_no_boundary",
+      "x_bar_low_k": 0.17308018760174676,
+      "x_bar_high_k": 0.3755039377192608,
+      "dwell_low_k": 0.5,
+      "dwell_high_k": 0.62
+    },
+    {
+      "C": 300,
+      "T": 60200,
+      "k_star": NaN,
+      "k_bracket_low": NaN,
+      "k_bracket_high": NaN,
+      "beta2_star": NaN,
+      "one_minus_beta2_star": NaN,
+      "status": "always_fails_no_boundary",
+      "x_bar_low_k": 0.5855088098998639,
+      "x_bar_high_k": 0.5686415966256954,
+      "dwell_low_k": 0.7533333333333333,
+      "dwell_high_k": 0.74
+    },
+    {
+      "C": 1000,
+      "T": 200200,
+      "k_star": NaN,
+      "k_bracket_low": NaN,
+      "k_bracket_high": NaN,
+      "beta2_star": NaN,
+      "one_minus_beta2_star": NaN,
+      "status": "always_fails_no_boundary",
+      "x_bar_low_k": 0.8154456022662182,
+      "x_bar_high_k": 0.7464246317683707,
+      "dwell_low_k": 0.887,
+      "dwell_high_k": 0.839
+    }
+  ],
+  "rho_50_crossings": {
+    "10": 0.4082482904638631,
+    "30": 0.12659301546803164,
+    "100": 0.12704771718155725
+  },
+  "log_rho_50_spread_decades": 0.5085146298485679,
+  "regret_slopes_lambda": {
+    "Adam (beta2=0.5)": 1.2274853774811696,
+    "AMSGrad (raw)": 1.3069096715070807,
+    "AdaGrad": 1.419674632922593
+  },
+  "verdict_summary": "Pre-registered memory-horizon hypothesis refuted. Divergence at large C is beta2-independent and governed by post-burst first-moment drift."
+}
