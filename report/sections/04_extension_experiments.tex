@@ -48,21 +48,22 @@ Probes P1--P3 ($N=1$ deterministic run each, source files: \texttt{results/mecha
 \paragraph{Regime I: $\tau_2 \lesssim T_{\text{burst}}$ (v-Collapse).}
 When $\beta_2 = 0.9$ ($\tau_2 = 10$), $v_t$ decays from $v_{\text{burst}} \approx C^2$ to $\approx 1$ in roughly $\tau_2$ steps. \textsc{Adam} steps against the gradient during the $C - 1$ non-burst steps at a greatly amplified rate. This regime fails at \emph{all} learning rates $\alpha$ including $0.10$ (Probe P2, $\beta_2 = 0.9$ column).
 
-\paragraph{Regime II: $\tau_2 \gg T_{\text{burst}}$ (Post-Burst Drift).}
+\paragraph{Regime II: $\tau_2 \gg T_{\text{burst}}$ (Post-Burst Drift \& Three-Regime Structure).}
 When $\beta_2 = 0.999$ ($\tau_2 = 1000$), $\tilde{v}_t \approx \mathbb{E}[g^2] \approx C$ remains nearly constant across the cycle. At the burst step, $\tilde{m}_t$ jumps to $+(1-\beta_1)C = 10$ and then decays exponentially with time constant $\tau_1 = \frac{1}{1-\beta_1} = 10$ steps. It crosses zero at:
 \begin{equation}
     s^* \approx \tau_1 \ln\!\bigl((1-\beta_1)C + 1\bigr) \approx 24 \text{ steps} \quad (C=100),
     \label{eq:s_star}
 \end{equation}
-where $\tau_1 = 1/(1-\beta_1)$ is the first-moment memory horizon. During steps $1 \to s^*$ the update direction is correct (towards $-1$). For steps $s^*+1 \to C$, $\tilde{m}_t < 0$ so \textsc{Adam} steps rightward at rate $\approx \alpha / \sqrt{\tilde{v}_t} \approx \alpha / \sqrt{C}$. Total rightward drift per cycle is $\alpha(C - s^*)/\sqrt{C}$. Divergence requires this drift to overcome the burst retraction, yielding the \emph{traverse condition}:
-\begin{equation}
-    \alpha (C - s^*(C)) \gtrsim 2\sqrt{C}.
-    \label{eq:traverse_condition}
-\end{equation}
-The validity condition for this threshold is $k \ll 1$ (equivalent to $\tau_2 \gg C$), ensuring $\tilde{v}_t$ remains approximately flat throughout the cycle. For $C=30$, the asymptotic formula predicts $\alpha^* \approx 0.68$, yet empirical survival persists up to $\alpha=0.8$ because at $C=30$, $s^* \approx 14$ spans nearly half the 30-step period, making discrete momentum transients non-negligible.
+where $\tau_1 = 1/(1-\beta_1)$ is the first-moment memory horizon. During steps $1 \to s^*$ the update direction is correct (towards $-1$). For steps $s^*+1 \to C$, $\tilde{m}_t < 0$ so \textsc{Adam} steps rightward at rate $\approx \alpha / \sqrt{\tilde{v}_t} \approx \alpha / \sqrt{C}$. Across learning rates $\alpha$, this generates a structured three-regime response:
+\begin{enumerate}
+    \item \textbf{Sub-Threshold Trapping ($\alpha < \alpha^*$):} When $\alpha$ is small, the leftward retraction during $s^*$ steps is insufficient to reach $-1$. Parameters oscillate in a pinned band with cycle mean $\bar{x} \approx 1 - \frac{\alpha(C - s^*)}{2\sqrt{C}}$. For $C=100$, this predicts $\bar{x} = 0.620$ at $\alpha=0.10$ and $\bar{x} = 0.240$ at $\alpha=0.20$, closely matching the observed $0.602$ and $0.205$.
+    \item \textbf{Survival Window ($\alpha \in [\alpha^*,\, \sim 1.8\alpha^*]$):} The lower boundary $\alpha^*(C) = \frac{2\sqrt{C}}{C - s^*(C)}$ marks the window opening where push and retraction amplitudes equalize. The upper boundary ($\alpha \approx 0.457$ at $C=100$) is governed by clipping asymmetry: time pinned at the $-1$ boundary during rapid retraction exceeds time pinned at $+1$ during slow rightward drift.
+    \item \textbf{High-$\alpha$ Plateau ($\alpha \gtrsim 1.8\alpha^*$):} For large $\alpha$, rightward drift crosses the interval in $<25$ steps, pinning $x_t = +1$ for half the cycle ($\bar{x} \approx +0.17$ to $+0.22$, $\text{Dwell} \approx 0.50$).
+\end{enumerate}
+The validity condition for this threshold is $k \ll 1$ (i.e., $\tau_2 \gg C$). At $C=30$, $s^* \approx 14$ spans nearly half the period, so survival persists up to $\alpha=0.80$ (vs.\ predicted $0.68$). At $C=300$, the survival window narrows to $[0.138, 0.155]$ (ratio $\approx 1.13$) as rightward drift rapidly overwhelms clipping asymmetry. At $C=1000$, the validity condition fails ($k=1.0$ at $\beta_2=0.999$), preventing boundary detection.
 
 \paragraph{Empirical Validation: $\alpha^*(C)$.}
-Figure~\ref{fig:alpha_star} plots the predicted threshold $\alpha^*(C) = \frac{2\sqrt{C}}{C - s^*(C)}$ alongside the observed lower boundary of the survival window (bisection at $\beta_2 = 0.999$ with convergence gate $T_{\rm cycles}=800$). At $C=100$, the predicted $\alpha^* = 0.263$ matches the observed $\alpha^* = 0.251$ (ratio $= 0.956$); at $C=300$, predicted $= 0.130$ vs.\ observed $= 0.138$ (ratio $= 1.055$). Source: \nolinkurl{results/mechanism_probes/alpha_star_bisection.csv}. Dwell fraction is $0.50$, not $1.0$, confirming a full-interval periodic sweep rather than a pinned boundary.
+Figure~\ref{fig:alpha_star} plots the predicted threshold $\alpha^*(C) = \frac{2\sqrt{C}}{C - s^*(C)}$ alongside observed bisections under the convergence gate ($T_{\rm cycles}=800$). At $C=100$, predicted $\alpha^* = 0.263$ matches observed $\alpha^* = 0.251$ (ratio $= 0.956$); at $C=300$, predicted $= 0.130$ vs.\ observed $= 0.138$ (ratio $= 1.055$). Source: \nolinkurl{results/mechanism_probes/alpha_star_bisection.csv}.
 
 \begin{figure}[t]
 \centering
