@@ -2,12 +2,12 @@
 \label{sec:theory}
 
 \subsection{Online Convex Optimization Framework}
-Let $\mathcal{F} \subset \mathbb{R}^d$ be a compact convex feasible set with $\ell_\infty$ diameter $D_\infty = \sup_{x, y \in \mathcal{F}} \|x - y\|_\infty$. In the Online Convex Optimization (OCO) setting \citep{hazan2016introduction}, an algorithm selects a parameter vector $x_t \in \mathcal{F}$ at round $t \in [1, T]$, after which an adversary reveals a convex cost function $f_t: \mathcal{F} \to \mathbb{R}$. The performance of the algorithm is evaluated by its cumulative regret with respect to the best static comparator $x^* \in \mathcal{F}$ in hindsight:
+Let $\mathcal{F} \subset \mathbb{R}^d$ be a compact convex feasible set with $\ell_\infty$ diameter $D_\infty = \sup_{x, y \in \mathcal{F}} \|x - y\|_\infty$. In the Online Convex Optimization (OCO) setting \citep{hazan2016introduction}, an algorithm selects a parameter vector $x_t \in \mathcal{F}$ at round $t \in [1, T]$, after which an adversary reveals a convex cost function $f_t: \mathcal{F} \to \mathbb{R}$. In the one-dimensional counterexample setting ($d=1, \mathcal{F} = [-1, 1]$), the loss functions are linear coordinate forms $f_t(x) = g_t x$. The performance of the algorithm is evaluated by its cumulative regret with respect to the best static comparator $x^* \in \mathcal{F}$ in hindsight:
 \begin{equation}
-    R_T = \sum_{t=1}^T \left(f_t(x_t) - f_t(x^*)\right) \le \sum_{t=1}^T \langle g_t, x_t - x^* \rangle,
+    R_T = \sum_{t=1}^T \left(f_t(x_t) - f_t(x^*)\right) = \sum_{t=1}^T g_t (x_t - x^*).
     \label{eq:regret_def}
 \end{equation}
-where $g_t = \nabla f_t(x_t)$ is the subgradient at round $t$. A sublinear regret bound, $R_T = o(T)$, guarantees convergence of the average regret $\lim_{T \to \infty} R_T / T = 0$.
+A sublinear regret bound, $R_T = o(T)$, guarantees convergence of the average regret $\lim_{T \to \infty} R_T / T = 0$.
 
 \subsection{Adam and Step-Dependent Bias Correction}
 \textsc{Adam} \citep{kingma2014adam} maintains exponential moving averages of both the gradient and its element-wise square:
@@ -58,15 +58,15 @@ In algorithms like \textsc{AdaGrad}, the accumulator $G_t = G_{t-1} + g_t^2$ is 
 \begin{equation}
     \sum_{t=2}^T \langle x_t - x^*, \Gamma_t (x_t - x^*) \rangle \le D_\infty^2 \text{Tr}(V_T - V_1).
 \end{equation}
-\textbf{The Fatal Flaw in \textsc{Adam}:} Because \textsc{Adam} computes $v_t$ via an exponential moving average, $v_t$ can shrink whenever a large gradient is followed by smaller gradients. When $v_t < v_{t-1}$, $\Gamma_t$ has negative diagonal entries. Because $(x_t - x^*)^2$ is positive, negative entries in $\Gamma_t$ destroy the upper bound, causing the sum in Eq.~\eqref{eq:telescoping_sum} to accumulate linear positive regret $\Omega(T)$.
+\textbf{The Fatal Flaw in \textsc{Adam}:} Because \textsc{Adam} computes $v_t$ via an exponential moving average, $v_t$ can shrink whenever a large gradient is followed by smaller gradients. When $v_t < v_{t-1}$, $\Gamma_t$ has negative diagonal entries. This invalidates the telescoping bound (the quadratic sum in Eq.~\eqref{eq:telescoping_sum} can no longer be bounded by $D_\infty^2 \text{Tr}(V_T - V_1)$), breaking the standard OCO regret proof. The actual linear regret $\Omega(T)$ and dynamic divergence to the suboptimal boundary are established by the concrete counterexample dynamics.
 
 \subsection{The AMSGrad Resolution}
-\citet{reddi2018convergence} proved that convergence is restored if the effective second moment is guaranteed to be coordinate-wise non-decreasing. \textsc{AMSGrad} enforces this via the running maximum:
+\citet{reddi2018convergence} proved that convergence is restored if the effective second moment is guaranteed to be coordinate-wise non-decreasing. \textsc{AMSGrad} enforces this via the running maximum on the raw second-moment estimate:
 \begin{equation}
-    \hat{v}_t = \max\left(\hat{v}_{t-1}, v_t\right), \qquad \hat{v}_0 = \mathbf{0}.
+    \hat{v}_t = \max\left(\hat{v}_{t-1}, v_t\right), \qquad \hat{v}_0 = \mathbf{0},
     \label{eq:amsgrad_max}
 \end{equation}
-Since $\hat{v}_t \ge \hat{v}_{t-1}$, for any non-increasing step-size schedule $\alpha_t = \frac{\alpha}{\sqrt{t}}$:
+following Algorithm~2 of \citet{reddi2018convergence} without second-moment debiasing. Since $\hat{v}_t \ge \hat{v}_{t-1}$, for any non-increasing step-size schedule $\alpha_t = \frac{\alpha}{\sqrt{t}}$:
 \begin{equation}
     \Gamma_t = \frac{\sqrt{\hat{v}_t}}{\alpha_t} - \frac{\sqrt{\hat{v}_{t-1}}}{\alpha_{t-1}} \succeq 0 \quad \forall t \ge 1.
 \end{equation}
