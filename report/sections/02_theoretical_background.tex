@@ -34,7 +34,7 @@ Parameters are subsequently updated using the projected coordinate rule:
 \end{equation}
 where $\epsilon > 0$ ensures numerical stability outside the square root.
 
-\subsection{The Breakdown of the Telescoping Sum ($\Gamma_t \not\succeq 0$)}
+\subsection{The Breakdown of the Telescoping Sum (\texorpdfstring{$\Gamma_t \not\succeq 0$}{Gamma\_t not PSD})}
 In standard generic adaptive gradient updates, the step is framed as a proximal projection under a dynamic metric matrix $V_t = \text{diag}(\sqrt{v_t}) / \alpha_t$:
 \begin{equation}
     x_{t+1} = \arg\min_{x \in \mathcal{F}} \left\| x - \left(x_t - V_t^{-1} g_t\right) \right\|_{V_t}^2.
@@ -44,10 +44,11 @@ Applying standard non-expansiveness properties of the projection under inner pro
     \| x_{t+1} - x^* \|_{V_t}^2 \le \| x_t - x^* \|_{V_t}^2 - 2 \langle g_t, x_t - x^* \rangle + \| g_t \|_{V_t^{-1}}^2.
 \end{equation}
 Rearranging and summing from $t=1$ to $T$ yields:
-\begin{equation}
-    \sum_{t=1}^T \langle g_t, x_t - x^* \rangle \le \frac{1}{2} \| x_1 - x^* \|_{V_1}^2 + \frac{1}{2} \sum_{t=2}^T \langle x_t - x^*, \Gamma_t (x_t - x^*) \rangle + \frac{1}{2} \sum_{t=1}^T \| g_t \|_{V_t^{-1}}^2,
+\begin{align}
+    \sum_{t=1}^T \langle g_t, x_t - x^* \rangle &\le \frac{1}{2} \| x_1 - x^* \|_{V_1}^2 + \frac{1}{2} \sum_{t=1}^T \| g_t \|_{V_t^{-1}}^2 \nonumber \\
+    &\quad + \frac{1}{2} \sum_{t=2}^T \langle x_t - x^*, \Gamma_t (x_t - x^*) \rangle,
     \label{eq:telescoping_sum}
-\end{equation}
+\end{align}
 where the differential metric matrix $\Gamma_t$ is defined as:
 \begin{equation}
     \Gamma_t \triangleq V_t - V_{t-1} = \frac{\text{diag}(\sqrt{v_t})}{\alpha_t} - \frac{\text{diag}(\sqrt{v_{t-1}})}{\alpha_{t-1}}.
@@ -55,7 +56,7 @@ where the differential metric matrix $\Gamma_t$ is defined as:
 \end{equation}
 In algorithms like \textsc{AdaGrad}, the accumulator $G_t = G_{t-1} + g_t^2$ is monotonically non-decreasing, and with non-increasing step sizes $\alpha_t \le \alpha_{t-1}$, $\Gamma_t \succeq 0$ holds unconditionally. Under positive semi-definiteness, the cross-term in Eq.~\eqref{eq:telescoping_sum} cleanly telescopes:
 \begin{equation}
-    \sum_{t=2}^T \langle x_t - x^*, \Gamma_t (x_t - x^*) \rangle \le D_\infty^2 \sum_{t=2}^T \text{Tr}(\Gamma_t) = D_\infty^2 \text{Tr}(V_T - V_1).
+    \sum_{t=2}^T \langle x_t - x^*, \Gamma_t (x_t - x^*) \rangle \le D_\infty^2 \text{Tr}(V_T - V_1).
 \end{equation}
 \textbf{The Fatal Flaw in \textsc{Adam}:} Because \textsc{Adam} computes $v_t$ via an exponential moving average, $v_t$ can shrink whenever a large gradient is followed by smaller gradients. When $v_t < v_{t-1}$, $\Gamma_t$ has negative diagonal entries. Because $(x_t - x^*)^2$ is positive, negative entries in $\Gamma_t$ destroy the upper bound, causing the sum in Eq.~\eqref{eq:telescoping_sum} to accumulate linear positive regret $\Omega(T)$.
 

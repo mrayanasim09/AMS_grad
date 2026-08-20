@@ -12,7 +12,7 @@ Our mechanism discrimination experiments reveal two structurally distinct diverg
 \textsc{AMSGrad} successfully resolves Regime I by enforcing $\hat{v}_t \ge \hat{v}_{t-1}$. This guarantees $\Gamma_t \succeq 0$ and restores sublinear regret $\mathcal{O}(\sqrt{T})$ under decreasing step sizes. However, in non-stationary deep learning settings, the historical maximum $\hat{v}_t$ can be locked by a single early outlier gradient burst, depressing future coordinate-wise learning rates and inducing practical sluggishness.
 
 \subsection{Regret Exponents Under Constant Step Size}
-Table~\ref{tab:lambda_slopes} reports empirical windowed log-log regret slopes $\lambda$ (fit over $t \in [0.1T, T]$) for all three optimizers on the stochastic benchmark ($C=20, \delta=0.05$, constant $\alpha=0.8$, $N=30$ seeds; source: \texttt{results/mechanism\_probes/lambda\_regret\_slopes.json}).
+Table~\ref{tab:lambda_slopes} reports empirical windowed log-log regret slopes $\lambda$ (fit over $t \in [0.1T, T]$) for all three optimizers on the stochastic benchmark ($C=20, \delta=0.05$, constant $\alpha=0.8$, $N=30$ seeds; source: \nolinkurl{results/mechanism_probes/lambda_regret_slopes.json}).
 
 \begin{table}[h]
 \centering
@@ -47,4 +47,4 @@ In this work, we presented a complete, reproducible replication of the \textsc{A
 \end{enumerate}
 
 \paragraph{Data and Code Availability.}
-All experimental scripts, result files (\texttt{results/*.csv}, \texttt{results/mechanism\_probes/*}), and a reproducible virtual environment specification are archived in the project repository. The repository includes: \texttt{experiments/reanalyze\_all.py}, \texttt{experiments/mechanism\_validation.py}, \texttt{experiments/make\_alpha\_star\_fig.py}, and the \texttt{src/} package. Specific CSV source files are cited inline throughout \S\ref{sec:extension}. A public release URL will be added upon acceptance; the full archive can be requested from the authors.
+All experimental scripts, result files (\nolinkurl{results/*.csv}, \nolinkurl{results/mechanism_probes/*}), and a reproducible virtual environment specification are archived in the project repository. The repository includes: \nolinkurl{experiments/reanalyze_all.py}, \nolinkurl{experiments/mechanism_validation.py}, \nolinkurl{experiments/make_alpha_star_fig.py}, and the \texttt{src/} package. Specific CSV source files are cited inline throughout \S\ref{sec:extension}. A public release URL will be added upon acceptance; the full archive can be requested from the authors.

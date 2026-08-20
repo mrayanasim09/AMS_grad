@@ -6,23 +6,23 @@ All experiments are implemented from scratch in pure NumPy and executed in a ded
 
 \paragraph{Hyperparameters.} Table~\ref{tab:frozen_hyperparams} lists the frozen configuration parameters used across the deterministic and stochastic counterexample benchmarks. All experiments initialize parameters at the symmetric midpoint $x_1 = 0.0$ on the bounded domain $\mathcal{F} = [-1, 1]$. All adaptive optimizers use $\epsilon = 10^{-8}$ in the denominator of Eq.~\eqref{eq:adam_update} for numerical stability.
 
-\begin{table}[h]
+\begin{table*}[t]
 \centering
 \scriptsize
-\caption{Frozen Experimental Parameters for Counterexample Replications.}
+\caption{Frozen Experimental Parameters for Counterexample Replications (all adaptive optimizers use $\epsilon = 10^{-8}$).}
 \label{tab:frozen_hyperparams}
-\begin{tabular}{lccccccc}
+\begin{tabular}{lcccccc}
 \toprule
-\textbf{Benchmark Regime} & $C$ & $T$ & $\alpha$ & $\beta_1$ & $\beta_2$ & $\delta$ & $\epsilon$ \\
+\textbf{Benchmark Regime} & $C$ & $T$ & $\alpha$ & $\beta_1$ & $\beta_2$ & $\delta$ \\
 \midrule
-Deterministic (Adam Fail) & $10$ & $500$ & $0.8$ & $0.9$ & $0.5$ & --- & $10^{-8}$ \\
-Deterministic (Adam Control) & $10$ & $500$ & $0.8$ & $0.9$ & $0.999$ & --- & $10^{-8}$ \\
-Deterministic (AMSGrad / AdaGrad) & $10$ & $500$ & $0.8$ & $0.9$ & $0.5$ & --- & $10^{-8}$ \\
-Stochastic Replication & $20$ & $3000$ & $0.8$ & $0.9$ & $0.5$ & $0.05$ & $10^{-8}$ \\
-Phase 4 Grid Sweep ($N=100$) & $[10, 1000]$ & $50(C+1)$ & $0.8$ & $0.9$ & Swept & $0.10$ & $10^{-8}$ \\
+Deterministic (Adam Fail) & $10$ & $500$ & $0.8$ & $0.9$ & $0.5$ & --- \\
+Deterministic (Adam Control) & $10$ & $500$ & $0.8$ & $0.9$ & $0.999$ & --- \\
+Deterministic (AMSGrad / AdaGrad) & $10$ & $500$ & $0.8$ & $0.9$ & $0.5$ & --- \\
+Stochastic Replication & $20$ & $3000$ & $0.8$ & $0.9$ & $0.5$ & $0.05$ \\
+Phase 4 Grid Sweep ($N=100$) & $[10, 1000]$ & $50(C+1)$ & $0.8$ & $0.9$ & Swept & $0.10$ \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 \subsection{Deterministic Counterexample Reproduction}
 In the deterministic periodic setting (Theorem~3 of \citet{reddi2018convergence}), an objective cycle consists of one large gradient step ($g_t = +C$) followed by $C-1$ negative steps ($g_t = -1$). Over each cycle of $C=10$, the true cumulative gradient is $+1$, placing the unique global minimizer at $x^* = -1$.
