@@ -7,7 +7,7 @@
 \usepackage{booktabs}
 \usepackage{hyperref}
 \usepackage[numbers,sort&compress]{natbib}
-\usepackage{microtype}
+\usepackage[expansion=false]{microtype}
 \usepackage{xcolor}
 
 \hypersetup{
@@ -19,8 +19,7 @@
 
 \title{\textbf{From Adam to AMSGrad: Exact Counterexample Replication, Diagnostic Dynamics, and Phase-Boundary Scaling}}
 \author{
-    \textbf{Research Report} --- Adaptive Gradient Methods Replication \& Extension \\
-    % TODO: replace with actual repository URL when published
+    \textbf{Research Report} --- Adaptive Gradient Methods Replication \& Extension
 }
 \date{\today}
 
@@ -29,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-Adaptive gradient algorithms, led by \textsc{Adam}, are fundamental to deep learning optimization. However, \citet{reddi2018convergence} revealed a fundamental flaw in \textsc{Adam}'s convergence proof under the Online Convex Optimization (OCO) framework: when informative gradients occur sparsely, the exponential moving average of squared gradients can decay between bursts, violating the positive semi-definiteness condition ($\Gamma_t \not\succeq 0$) and causing divergence to suboptimal boundaries. \textsc{AMSGrad} resolves this by enforcing a monotonic running maximum ($\hat{v}_t = \max(\hat{v}_{t-1}, v_t)$). In this work, we present a complete, from-scratch NumPy reproduction and pre-registered extension of the \textsc{Adam} $\to$ \textsc{AMSGrad} lineage. We reconstruct both deterministic (Theorem~3) and stochastic (Section~3) counterexamples with live $\Gamma_t$ diagnostic tracking. A parametric extension sweeps the $(\beta_2, C)$ phase boundary across $4{,}500$ stochastic runs. Under rigorous cycle-averaged metrics, we find a two-regime divergence structure: (i) a v-collapse regime ($\tau_2 \lesssim T_{\text{burst}}$) where \textsc{Adam} fails unconditionally for all learning rates, and (ii) a post-burst drift regime ($\tau_2 \gg T_{\text{burst}}$) where divergence is governed by the traverse condition $\alpha(C - s^*) \gtrsim 2\sqrt{C}$ with $s^* = \tau_1 \ln((1-\beta_1)C+1)$. The divergence boundary ceases to exist for $C \ge 100$, refuting the pre-registered $C^{-1}$ memory-horizon scaling law. The predicted traverse threshold $\alpha^* = 0.263$ matches the empirically bisected boundary $\alpha^* = 0.251$ at $C=100$ within $5\%$, constituting the strongest quantitative prediction of this study.
+Adaptive gradient algorithms, led by \textsc{Adam}, are fundamental to deep learning optimization. However, \citet{reddi2018convergence} revealed a fundamental flaw in \textsc{Adam}'s convergence proof under the Online Convex Optimization (OCO) framework: when informative gradients occur sparsely, the exponential moving average of squared gradients can decay between bursts, violating the positive semi-definiteness condition ($\Gamma_t \not\succeq 0$) and causing divergence to suboptimal boundaries. \textsc{AMSGrad} resolves this by enforcing a monotonic running maximum ($\hat{v}_t = \max(\hat{v}_{t-1}, v_t)$). In this work, we present a complete, from-scratch NumPy reproduction and pre-registered extension of the \textsc{Adam} $\to$ \textsc{AMSGrad} lineage. We reconstruct both deterministic (Theorem~3) and stochastic (Section~3) counterexamples with live $\Gamma_t$ diagnostic tracking. A parametric extension sweeps the $(\beta_2, C)$ phase boundary across $4{,}500$ stochastic runs with $\beta_2 \in [0.05,\, 1-10^{-6}]$. Under rigorous cycle-averaged metrics, we find a two-regime divergence structure: (i) a v-collapse regime ($\tau_2 \lesssim T_{\text{burst}}$) where \textsc{Adam} fails unconditionally for all learning rates, and (ii) a post-burst drift regime ($\tau_2 \gg T_{\text{burst}}$) where divergence is governed by the traverse condition $\alpha(C - s^*) \gtrsim 2\sqrt{C}$ with $s^* = \tau_1 \ln((1-\beta_1)C+1)$. The divergence boundary ceases to exist for $C \ge 100$ across all $\beta_2 \in [0.05,\, 1-10^{-6}]$, refuting the pre-registered $C^{-1}$ memory-horizon scaling law. The predicted traverse threshold $\alpha^* = 0.263$ matches the empirically bisected boundary $\alpha^* = 0.251$ at $C=100$ within $5\%$, constituting the strongest quantitative prediction of this study.
 \end{abstract}
 
 \input{sections/01_intro}

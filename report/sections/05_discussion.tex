@@ -5,19 +5,40 @@
 Our mechanism discrimination experiments reveal two structurally distinct divergence regimes at large gradient burst spacing:
 \begin{enumerate}
     \item \textbf{Regime I (v-Collapse, $\tau_2 \lesssim T_{\text{burst}}$):} The second-moment estimate decays between bursts, amplifying the effective learning rate on non-burst steps. This regime fails unconditionally for all learning rates $\alpha$ tested (Probe P2, $\beta_2 = 0.9$ column, $C=100$). The fix (\textsc{AMSGrad}) is precisely targeted at this regime.
-    \item \textbf{Regime II (Post-Burst Drift, $\tau_2 \gg T_{\text{burst}}$):} With high $\beta_2$, $v_t$ remains approximately constant. Failure is governed by the traverse condition $\alpha(C - s^*(C)) \gtrsim 2\sqrt{C}$, where $s^*(C) = \tau_1 \ln((1-\beta_1)C+1)$ is the protected window during which the first moment $\tilde{m}_t$ remains positive after a burst. At $C=100$, the predicted threshold $\alpha^*=0.263$ matches the empirically bisected boundary $\alpha^*=0.251$ to within $5\%$.
+    \item \textbf{Regime II (Post-Burst Drift, $\tau_2 \gg T_{\text{burst}}$):} With high $\beta_2$, $v_t$ remains approximately constant. Failure is governed by the traverse condition $\alpha(C - s^*(C)) \gtrsim 2\sqrt{C}$, where $s^*(C) = \tau_1 \ln((1-\beta_1)C+1)$ is the protected window during which the first moment $\tilde{m}_t$ remains positive after a burst, and $\tau_1 = 1/(1-\beta_1)$ is the first-moment memory horizon. At $C=100$, the predicted threshold $\alpha^*=0.263$ matches the empirically bisected boundary $\alpha^*=0.251$ to within $5\%$.
 \end{enumerate}
 
 \subsection{Practical Conservatism of AMSGrad}
 \textsc{AMSGrad} successfully resolves Regime I by enforcing $\hat{v}_t \ge \hat{v}_{t-1}$. This guarantees $\Gamma_t \succeq 0$ and restores sublinear regret $\mathcal{O}(\sqrt{T})$ under decreasing step sizes. However, in non-stationary deep learning settings, the historical maximum $\hat{v}_t$ can be locked by a single early outlier gradient burst, depressing future coordinate-wise learning rates and inducing practical sluggishness.
 
 \subsection{Regret Exponents Under Constant Step Size}
-We report windowed log-log regret slopes $\lambda$ over $t \in [0.1T, T]$ for all three optimizers on the stochastic benchmark ($C=20, \delta=0.05$, $\alpha=0.8$ constant; source: \texttt{results/mechanism\_probes/lambda\_regret\_slopes.json}). \emph{Caveat:} A constant step size $\alpha$ violates the required step-decay conditions of all three regret theorems (\textsc{Adam}, \textsc{AMSGrad}, \textsc{AdaGrad} all require $\alpha_t \to 0$). The reported $\lambda$ values are purely empirical descriptors of finite-time behaviour and must not be interpreted as theoretical convergence rate comparisons or as evidence for one optimizer having ``worse regret'' than another.
+Table~\ref{tab:lambda_slopes} reports windowed log-log regret slopes $\lambda$ (fit over $t \in [0.1T, T]$) for all three optimizers on the stochastic benchmark ($C=20, \delta=0.05$, $\alpha=0.8$ constant, $N=30$ seeds; source: \texttt{results/mechanism\_probes/lambda\_regret\_slopes.json}).
+
+\begin{table}[h]
+\centering
+\scriptsize
+\caption{Empirical windowed log-log regret slopes $\lambda$ under constant step size ($\alpha=0.8$). \emph{Caveat:} these are finite-time empirical descriptors only; see text.}
+\label{tab:lambda_slopes}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Optimizer} & $\lambda$ & Note \\
+\midrule
+\textsc{Adam} ($\beta_2 = 0.5$) & $1.2275$ & super-linear (diverging) \\
+\textsc{AMSGrad} (raw)          & $1.3069$ & super-linear (diverging) \\
+\textsc{AdaGrad}                & $1.4197$ & super-linear (diverging) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Caveat:} A constant step size $\alpha$ violates the required step-decay conditions of all three regret theorems (\textsc{Adam}, \textsc{AMSGrad}, \textsc{AdaGrad} all require $\alpha_t \to 0$). The reported $\lambda$ values are purely empirical descriptors of finite-time behaviour and must \emph{not} be interpreted as theoretical convergence rate comparisons or as evidence for one optimizer having ``worse regret'' than another.
 
 \subsection{Conclusion}
 In this work, we presented a complete, reproducible replication of the \textsc{Adam} $\to$ \textsc{AMSGrad} transition and a pre-registered parametric extension. Our primary findings are:
 \begin{enumerate}
     \item \textbf{Exact Counterexample Reproduction:} Both deterministic and stochastic Reddi et al.\ counterexamples are reproduced, with live $\Gamma_t$ tracking visually confirming the OCO semi-definiteness breakdown.
-    \item \textbf{Boundary Disappearance:} Under rigorous cycle-averaged metrics, the divergence boundary exists only at $C=30$ ($k^* = 0.300, \beta_2^* = 0.990$). For $C \ge 100$, \textsc{Adam} fails unconditionally across all $\beta_2$, refuting the pre-registered $C^{-1}$ scaling law.
-    \item \textbf{Two-Regime Mechanism:} v-collapse drives failure at low $\tau_2$; post-burst first-moment drift governs failure at large $\tau_2$. The traverse threshold $\alpha^*(C) = 2\sqrt{C}/(C - s^*(C))$ is quantitatively validated at $C=100$.
+    \item \textbf{Boundary Disappearance:} Under rigorous cycle-averaged metrics, the divergence boundary exists only at $C=30$ ($k^* = 0.300 \pm 5 \times 10^{-5}$, $\beta_2^* = 0.990 \pm 2 \times 10^{-6}$; bisection half-intervals). For $C \ge 100$, \textsc{Adam} fails unconditionally across all $\beta_2 \in [0.05,\, 1-10^{-6}]$, refuting the pre-registered $C^{-1}$ scaling law. At $C=10$, behavior is mixed: survival at high $\beta_2$ and failure at $\beta_2=0.5$.
+    \item \textbf{Two-Regime Mechanism:} v-collapse drives failure at low $\tau_2$; post-burst first-moment drift governs failure at large $\tau_2$. The traverse threshold $\alpha^*(C) = 2\sqrt{C}/(C - s^*(C))$ is quantitatively validated at $C=100$ (5\% error) and $C=300$ (6\% error).
 \end{enumerate}
+
+\paragraph{Data and Code Availability.}
+All experimental scripts, result files (\texttt{results/*.csv}, \texttt{results/mechanism\_probes/*}), and a reproducible virtual environment specification are archived in the project repository. The repository includes: \texttt{experiments/reanalyze\_all.py}, \texttt{experiments/mechanism\_validation.py}, \texttt{experiments/make\_alpha\_star\_fig.py}, and the \texttt{src/} package. Specific CSV source files are cited inline throughout \S\ref{sec:extension}. A public release URL will be added upon acceptance; the full archive can be requested from the authors.
