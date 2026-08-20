@@ -96,8 +96,8 @@ In the stochastic setting ($C=20, \delta=0.05, T=3000, N=30$ seeds), the expecte
     \caption{Cumulative regret $R_t$.}
     \label{fig:stoch_regret}
 \end{subfigure}
-\caption{Stochastic counterexample replication ($C=20, \delta=0.05$). \textsc{Adam} exhibits net positive drift and linear regret $\Omega(T)$, while \textsc{AMSGrad} and \textsc{AdaGrad} enforce sublinear regret.}
+\caption{Stochastic counterexample replication ($C=20, \delta=0.05$). Under constant step size $\alpha=0.8$, \textsc{Adam} exhibits net positive drift and linear regret $\Omega(T)$, while \textsc{AMSGrad} and \textsc{AdaGrad} maintain negative mean trajectories towards the optimal basin.}
 \label{fig:stochastic_reproduction}
 \end{figure}
 
-Under $\beta_2=0.5$, \textsc{Adam} exhibits an average terminal position of $\mathbb{E}[x_T] = +0.3765 \pm 0.8272$ with $62\%$ of seeds failing into the positive boundary ($x_T > 0.5$). \textsc{AMSGrad} maintains $\mathbb{E}[x_T] = -0.1452 \pm 0.7558$, with $30\%$ of seeds failing ($x_T > 0.5$)---substantially lower than \textsc{Adam}'s $62\%$ failure rate. \textsc{AdaGrad} achieves $\mathbb{E}[x_T] = -0.4204 \pm 0.5102$ with only $20\%$ failing ($80\%$ negative seeds). Cumulative regret plots confirm linear regret growth ($\text{slope} \approx 1.0$) for \textsc{Adam} and sublinear growth for \textsc{AMSGrad}.
+Under $\beta_2=0.5$, \textsc{Adam} exhibits an average terminal position of $\mathbb{E}[x_T] = +0.3765 \pm 0.8272$ with $62\%$ of seeds failing into the positive boundary ($x_T > 0.5$). \textsc{AMSGrad} maintains $\mathbb{E}[x_T] = -0.1452 \pm 0.7558$, with $30\%$ of seeds failing ($x_T > 0.5$)---substantially lower than \textsc{Adam}'s $62\%$ failure rate. \textsc{AdaGrad} achieves $\mathbb{E}[x_T] = -0.4204 \pm 0.5102$ with only $20\%$ failing ($80\%$ negative seeds). Note that under constant step size $\alpha = 0.8$, step sizes do not decay, so all optimizers exhibit linear regret $\Theta(T)$ asymptotically; theoretical sublinear regret $\mathcal{O}(\sqrt{T})$ for \textsc{AMSGrad} requires decreasing step sizes $\alpha_t \propto 1/\sqrt{t}$.

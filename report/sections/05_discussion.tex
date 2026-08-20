@@ -12,7 +12,7 @@ Our mechanism discrimination experiments reveal two structurally distinct diverg
 \textsc{AMSGrad} successfully resolves Regime I by enforcing $\hat{v}_t \ge \hat{v}_{t-1}$. This guarantees $\Gamma_t \succeq 0$ and restores sublinear regret $\mathcal{O}(\sqrt{T})$ under decreasing step sizes. However, in non-stationary deep learning settings, the historical maximum $\hat{v}_t$ can be locked by a single early outlier gradient burst, depressing future coordinate-wise learning rates and inducing practical sluggishness.
 
 \subsection{Regret Exponents Under Constant Step Size}
-Table~\ref{tab:lambda_slopes} reports windowed log-log regret slopes $\lambda$ (fit over $t \in [0.1T, T]$) for all three optimizers on the stochastic benchmark ($C=20, \delta=0.05$, $\alpha=0.8$ constant, $N=30$ seeds; source: \texttt{results/mechanism\_probes/lambda\_regret\_slopes.json}).
+Table~\ref{tab:lambda_slopes} reports empirical windowed log-log regret slopes $\lambda$ (fit over $t \in [0.1T, T]$) for all three optimizers on the stochastic benchmark ($C=20, \delta=0.05$, constant $\alpha=0.8$, $N=30$ seeds; source: \texttt{results/mechanism\_probes/lambda\_regret\_slopes.json}).
 
 \begin{table}[h]
 \centering
@@ -21,16 +21,22 @@ Table~\ref{tab:lambda_slopes} reports windowed log-log regret slopes $\lambda$ (
 \label{tab:lambda_slopes}
 \begin{tabular}{lcc}
 \toprule
-\textbf{Optimizer} & $\lambda$ & Note \\
+\textbf{Optimizer} & $\lambda$ & Transient Regime \\
 \midrule
-\textsc{Adam} ($\beta_2 = 0.5$) & $1.2275$ & super-linear (diverging) \\
-\textsc{AMSGrad} (raw)          & $1.3069$ & super-linear (diverging) \\
-\textsc{AdaGrad}                & $1.4197$ & super-linear (diverging) \\
+\textsc{Adam} ($\beta_2 = 0.5$) & $1.2275$ & Positive divergence ($\mathbb{E}[x_T] > 0$) \\
+\textsc{AMSGrad} (raw)          & $1.3069$ & Finite-window offset artifact \\
+\textsc{AdaGrad}                & $1.4197$ & Finite-window offset artifact \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\emph{Caveat:} A constant step size $\alpha$ violates the required step-decay conditions of all three regret theorems (\textsc{Adam}, \textsc{AMSGrad}, \textsc{AdaGrad} all require $\alpha_t \to 0$). The reported $\lambda$ values are purely empirical descriptors of finite-time behaviour and must \emph{not} be interpreted as theoretical convergence rate comparisons or as evidence for one optimizer having ``worse regret'' than another.
+\paragraph{Reconciliation: Apparent Super-Linear Slopes vs.\ $\mathcal{O}(T)$ Asymptotic Bounds.}
+On any compact domain $\mathcal{F} = [-1, 1]$ with bounded subgradients ($\mathbb{E}[g_t] = \delta$), the instantaneous expected regret is $\mathbb{E}[g_t(x_t - x^*)] \le 2\delta$, strictly capping cumulative regret at $\mathbb{E}[R_T] \le 2\delta T = \mathcal{O}(T)$. The apparent slopes $\lambda > 1$ in Table~\ref{tab:lambda_slopes} are finite-window fitting artifacts:
+\begin{enumerate}
+    \item \textbf{Initialization Offset:} Because parameters initialize at $x_1 = 0$ near the optimal basin $x^* = -1$, early instantaneous regret is near zero (or temporarily negative due to sample noise). Fitting a pure power law $R(t) \propto t^\lambda$ to an affine trajectory $R(t) \approx c(t - t_0)$ with a positive delay $t_0 > 0$ yields an apparent elasticity $\frac{d \ln R}{d \ln t} = \frac{t}{t - t_0} > 1$.
+    \item \textbf{Constant Step Size:} Under fixed $\alpha = 0.8$, step sizes do not decay ($\alpha_t \not\to 0$). Consequently, none of the optimizers achieve theoretical $\mathcal{O}(\sqrt{T})$ regret; instead, all three maintain non-vanishing steady-state variance around their attractors, generating asymptotically linear regret $\Theta(T)$.
+\end{enumerate}
+Therefore, the $\lambda$ values in Table~\ref{tab:lambda_slopes} describe transient log-log curvature under constant step size and must \emph{not} be interpreted as asymptotic convergence exponents or theoretical regret rates.
 
 \subsection{Conclusion}
 In this work, we presented a complete, reproducible replication of the \textsc{Adam} $\to$ \textsc{AMSGrad} transition and a pre-registered parametric extension. Our primary findings are:
