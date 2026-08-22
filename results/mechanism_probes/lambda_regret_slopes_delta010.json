@@ -1,0 +1,20 @@
+{
+  "Adam": {
+    "lambda": 1.0894,
+    "final_cumregret": 626.27,
+    "delta": 0.1,
+    "N": 200
+  },
+  "AMSGrad": {
+    "lambda": 1.0151,
+    "final_cumregret": 431.33,
+    "delta": 0.1,
+    "N": 200
+  },
+  "AdaGrad": {
+    "lambda": 0.8389,
+    "final_cumregret": 291.42,
+    "delta": 0.1,
+    "N": 200
+  }
+}
