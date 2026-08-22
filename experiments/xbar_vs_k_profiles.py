@@ -17,7 +17,7 @@ os.makedirs("results/mechanism_probes", exist_ok=True)
 os.makedirs("report/figures", exist_ok=True)
 
 # ── 1.  x̄ vs k profiles ──────────────────────────────────────────────────────
-C_values = [10, 30, 40, 50, 60, 70, 75]
+C_values = [10, 30, 40, 50, 60, 70, 75, 100]
 # Dense k grid: β₂ = 1 − k/C; k ∈ (0, C] — use 80 points per C
 T_cycles = 800
 alpha = 0.8
@@ -69,9 +69,6 @@ for idx, C in enumerate(C_values):
     ax.set_ylim(-1.05, 1.05)
     ax.text(0.97, 0.95, f"$\\alpha=0.8$", transform=ax.transAxes,
             ha="right", va="top", fontsize=7)
-
-# hide last panel (only 7 C values, 8 subplots)
-axes[-1].set_visible(False)
 
 fig.suptitle(r"$\bar{x}$ vs.\ dimensionless memory $k=(1-\beta_2)C$ at $\alpha=0.8$, $\beta_1=0.9$"
              "\n" r"Blue shading = survival set ($\bar{x}<0$); red dashed = zero line",

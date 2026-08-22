@@ -16,10 +16,10 @@ so that $\mathbb{E}[g_t] = \delta > 0$ and the optimal parameter is $x^* = -1$. 
 \begin{table*}[t]
 \centering
 \scriptsize
-\setlength{\tabcolsep}{6pt}
+\setlength{\tabcolsep}{8pt}
 \caption{Experimental Parameters across Benchmarks (all adaptive optimizers use $\epsilon = 10^{-8}$, $x_1 = 0$).}
 \label{tab:frozen_hyperparams}
-\begin{tabular}{lcccccc}
+\begin{tabular}{l c c c c c c}
 \toprule
 \textbf{Benchmark Regime} & $C$ & $T$ & $\alpha$ & $\beta_1$ & $\beta_2$ & $\delta$ \\
 \midrule
@@ -59,9 +59,9 @@ In the deterministic periodic setting (Theorem~3 of \citet{reddi2018convergence}
 
 As shown in Figure~\ref{fig:det_traj}:
 \begin{itemize}
-    \item \textbf{\textsc{Adam} Divergence ($\beta_2 = 0.5$):} With $\tau_2 = 2 \ll C=10$, the debiased second moment decays as in Table~\ref{tab:vt_trajectory}: $\tilde{v}_1 = 100.0$ post-burst, falling to $\tilde{v}_8 = 1.388$ by step 8. \textsc{Adam} begins moving rightward at step 8 ($\Delta x_8 \approx +0.052$); in steady-state late-cycle (steps 8--10), step magnitudes reach approximately $0.4$--$0.5\alpha$ (since $|\tilde{m}| \approx 0.4$--$0.5$ at $C=10$, never reaching $\tilde{m}=-1$). The trajectory reaches $x_T = +1.0000$ within the first few cycles.
-    \item \textbf{\textsc{Adam} High-$\beta_2$ Control ($\beta_2 = 0.999$):} With $\tau_2 = 1000 \gg C$, $v_t \approx 10.9$ throughout. \textsc{Adam} reaches $x_T = -0.7778$, confirming divergence is memory-driven.
-    \item \textbf{\textsc{AMSGrad} \& \textsc{AdaGrad}:} \textsc{AMSGrad} maintains $\hat{v}_t \approx 50.5$ (raw maximum, no debiasing) and reaches $x_T = -0.8969$; \textsc{AdaGrad} reaches $x_T = -0.9024$.
+    \item \textbf{\textsc{Adam} Divergence ($\beta_2 = 0.5$):} With $\tau_2 = 2 \ll C=10$, the debiased second moment decays as in Table~\ref{tab:vt_trajectory}: $\tilde{v}_1 = 100.0$ post-burst, falling to $\tilde{v}_8 = 1.388$ by step 8. \textsc{Adam} begins moving rightward at step 8 ($\Delta x_8 \approx +0.052$); in steady-state late-cycle (steps 8--10), step magnitudes reach approximately $0.4$--$0.5\alpha$ (since $|\tilde{m}| \approx 0.4$--$0.5$ at $C=10$, never reaching $\tilde{m}=-1$). The trajectory reaches terminal $x_T = +1.0000$ (cycle mean $\bar{x} = +1.0000$) within the first few cycles.
+    \item \textbf{\textsc{Adam} High-$\beta_2$ Control ($\beta_2 = 0.999$):} With $\tau_2 = 1000 \gg C$, $v_t \approx 10.9$ throughout. \textsc{Adam} oscillates around the negative basin, reaching $x_T = -0.7778$ (cycle mean $\bar{x} = -0.9486$), confirming divergence is memory-driven.
+    \item \textbf{\textsc{AMSGrad} \& \textsc{AdaGrad}:} \textsc{AMSGrad} maintains $\hat{v}_t \approx 50.5$ (raw maximum, no debiasing) and reaches $x_T = -0.8969$ ($\bar{x} = -0.9018$); \textsc{AdaGrad} reaches $x_T = -0.9024$ ($\bar{x} = -0.9024$).
 \end{itemize}
 
 \begin{table}[h]
@@ -94,7 +94,7 @@ Figure~\ref{fig:det_gamma} plots $\Gamma_t$ (Eq.~\ref{eq:gamma_def}). With raw E
 In the stochastic setting ($C=20, \delta=0.10, T=5000, N=200$ seeds; source: \nolinkurl{results/mechanism_probes/stochastic_ci_test_suite_N200.csv}), all results use the gradient law in Eq.~\eqref{eq:grad_law}. We evaluate six optimizers under constant $\alpha$:
 \begin{itemize}
     \item \textbf{\textsc{Adam}:} $\mathbb{E}[x_T] = +0.3297 \pm 0.7872$ (95\% CI $[+0.22, +0.44]$), $56\% \pm 6.9\%$ failure ($x_T > 0.5$).
-    \item \textbf{\textsc{RMSProp} (no momentum, $\beta=0.5$):} $\mathbb{E}[x_T] = +0.6694$, $72\% \pm 6.2\%$ failure. RMSProp fails even more severely than \textsc{Adam} because it lacks first-moment smoothing entirely.
+    \item \textbf{\textsc{RMSProp} (no momentum, $\beta=0.5$):} $\mathbb{E}[x_T] = +0.6694$, $72\% \pm 6.2\%$ failure. RMSProp fails even more severely than \textsc{Adam} because lacking first-moment smoothing ($\beta_1=0$), raw gradient impulses directly drive update magnitudes, accelerating second-moment decay and compounding directional drift.
     \item \textbf{\textsc{AMSGrad} (raw):} $\mathbb{E}[x_T] = -0.1702 \pm 0.7403$ (95\% CI $[-0.27, -0.07]$), $28\% \pm 6.2\%$ failure --- a 28 percentage-point improvement over \textsc{Adam}.
     \item \textbf{\textsc{AdaGrad}:} $\mathbb{E}[x_T] = -0.6529 \pm 0.3492$ (95\% CI $[-0.70, -0.60]$), $2\%$ failure.
     \item \textbf{\textsc{SGD} \& Momentum \textsc{SGD}:} SGD ($\alpha=0.01$): $\mathbb{E}[x_T]=-0.31$, $10\%$ failure. Momentum SGD ($\alpha=0.01, \beta_1=0.9$): $\mathbb{E}[x_T]=-0.12$, $34\%$ failure. Notably, without any second-moment scaling ($v \equiv 1$), there is no v-collapse mechanism; the higher failure rate of Momentum SGD relative to SGD reflects pure first-moment drift amplification---a standalone demonstration of the Regime II phenomenon without adaptive scaling.
@@ -108,7 +108,7 @@ Under $\delta=0.10$: $\hat{v} \approx (1-\beta_2)C^2 = 200$, $\text{Var}(g) \app
     \mathbb{E}[x] = \mathcal{L}(a) \triangleq \coth(a) - \frac{1}{a} \approx \frac{a}{3} \approx -0.054,
     \label{eq:langevin_mean}
 \end{equation}
-where $\mathcal{L}(a)$ is the Langevin function. The predicted mean of $-0.054$ captures the mild negative tilt and falls within the empirical range of finite-seed evaluations (e.g., observed $-0.08$ to $-0.17$). \emph{Scope caveat}: this diffusion approximation assumes unclipped linear Brownian motion on $[-1, 1]$ and stationary $\hat{v}$. At $\delta=0.50$ (the closing experiment), where $a \approx -0.603$, Eq.~\eqref{eq:langevin_mean} gives $\mathcal{L}(-0.603) \approx -0.20$, versus the observed mean of $-0.634 \pm 0.537$ (a $3\times$ underestimate). The cause is that strong burst-driven leftward excursions clip at the boundary $x=-1$, violating the unclipped Fokker-Planck assumption; the closing experiment is included to demonstrate the $\alpha_t \propto 1/\sqrt{t}$ regime (panel b), not as a constant-$\alpha$ Fokker-Planck validation.
+where $\mathcal{L}(a)$ is the Langevin function. The predicted mean of $-0.054$ is close to the observed $-0.08$ to $-0.17$, with boundary clipping at $-1$ pushing the empirical distribution slightly below the unclipped Langevin prediction. \emph{Scope caveat}: this diffusion approximation assumes unclipped linear Brownian motion on $[-1, 1]$ and stationary $\hat{v}$. At $\delta=0.50$ (the closing experiment), where $a \approx -0.603$, Eq.~\eqref{eq:langevin_mean} gives $\mathcal{L}(-0.603) \approx -0.20$, versus the observed mean of $-0.634 \pm 0.537$ (a $3\times$ underestimate). The cause is that strong burst-driven leftward excursions clip at the boundary $x=-1$, violating the unclipped Fokker-Planck assumption; the closing experiment is included to demonstrate the $\alpha_t \propto 1/\sqrt{t}$ regime (panel b), not as a constant-$\alpha$ Fokker-Planck validation.
 
 \paragraph{Asymptotic Convergence under $\alpha_t \propto 1/\sqrt{t}$.}
 Figure~\ref{fig:stochastic_resolution} evaluates optimizers under $\alpha_t = 0.8/\sqrt{t}$ at $C=20, \delta=0.50, T=5000, N=100$. Under decreasing step size, \textsc{AMSGrad} concentrates at $x^*=-1$: $\mathbb{E}[x_T]=-0.988 \pm 0.031$ ($98\%$ of seeds $< -0.90$). \textsc{Adam} diverges to $+1$ ($\mathbb{E}[x_T]=+0.729$). Long-horizon evaluation at $T=10^6$ ($\delta=0.10, N=20$) confirms asymptotic lock-in: \textsc{AMSGrad} $-0.998$, \textsc{Adam} $+0.999$.

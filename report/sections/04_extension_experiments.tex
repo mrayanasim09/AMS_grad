@@ -18,76 +18,88 @@ The stochastic sweep (Section~\ref{sec:reproduction}) uses single-point $x_T$, w
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/stochastic_phase_heatmap.pdf}
-\caption{Stochastic failure probability heatmap ($N=100$ seeds per cell, $4{,}500$ runs, $\delta=0.10$, $\alpha=0.8$; $\beta_2 = 1 - k/C$). $k$-grid: $\{0.1, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0\}$; $C$-values: $\{10, 30, 100, 300, 1000\}$. Numbers: empirical failure fraction $\pm$ Wilson 95\% CI half-width.}
+\caption{Stochastic failure probability heatmap ($N=100$ seeds per cell, $4{,}500$ runs, $\delta=0.10$, $\alpha=0.8$; $\beta_2 = 1 - k/C$). $k$-grid: $\{0.1, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0\}$; $C$-values: $\{10, 30, 100, 300, 1000\}$. The $k=C$ endpoint corresponds to $\beta_2=0$. Numbers: empirical failure fraction $\pm$ Wilson 95\% CI half-width.}
 \label{fig:stochastic_heatmap}
 \end{figure}
 
-Figure~\ref{fig:stochastic_heatmap} shows the full failure surface (source: \nolinkurl{results/phase4_grid_results.csv}). For $C=10$, failure rates are moderate across all $k$ (24\%--57\%), reflecting the small burst size. For $C=1000$, failure rates are uniformly high (mean $\approx 85\%$ across cells, non-monotone in $k$: row reads 73, 91, 84, 82, 88, 86, 89, 84, 79\%) --- attributed to severe v-collapse at all $k$, with the small-$k$ cells additionally experiencing Regime II drift. The stochastic results are not directly comparable to the deterministic bisection: at $C=10$, $\beta_2=0.99$ (stochastic: $\sim 33\%$ failure) the aperiodic stochastic arrivals allow diffusion into either basin, even when the deterministic construction would always survive. This is consistent with the broad stationary distribution predicted by the Fokker-Planck analysis.
+Figure~\ref{fig:stochastic_heatmap} shows the full failure surface (source: \nolinkurl{results/phase4_grid_results.csv}). For $C=10$, failure rates are moderate across all $k$ (24\%--57\%), reflecting the small burst size. For $C=1000$, failure rates are uniformly high (exact row mean $84.0\%$ across cells, non-monotone in $k$: row reads 73, 91, 84, 82, 88, 86, 89, 84, 79\%) --- attributed to severe v-collapse at high $k$, with the small-$k$ cells additionally experiencing Regime II drift. The stochastic results are not directly comparable to the deterministic bisection: at $C=10$, $\beta_2=0.99$ (stochastic: $\sim 33\%$ failure) the aperiodic stochastic arrivals allow diffusion into either basin, even when the deterministic construction would always survive. This is consistent with the broad stationary distribution predicted by the Fokker-Planck analysis.
 
 \subsection{Survival Set Profiles \& Deterministic Boundary Mapping}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/xbar_vs_k_profiles.pdf}
-\caption{Cycle-averaged position $\bar{x}$ vs.\ dimensionless memory $k=(1-\beta_2)C$ at $\alpha=0.8$, $\beta_1=0.9$, $T_{\text{cycles}}=800$ (source: \nolinkurl{results/mechanism_probes/xbar_vs_k_profiles.csv}). Blue shading marks the survival set ($\bar{x}<0$). The $k$-axis runs from $0$ (large $\beta_2\to 1$, Regime II) to $C$ (small $\beta_2\to 0$). Red dashed: $\bar{x}=0$.}
+\caption{Cycle-averaged position $\bar{x}$ vs.\ dimensionless memory $k=(1-\beta_2)C$ at $\alpha=0.8$, $\beta_1=0.9$, $T_{\text{cycles}}=800$ across $C \in \{10, \dots, 100\}$ (source: \nolinkurl{results/mechanism_probes/xbar_vs_k_profiles.csv}). Blue shading marks the survival set ($\bar{x}<0$). The $k$-axis runs from $0$ (large $\beta_2\to 1$, Regime II) to $C$ (small $\beta_2\to 0$). Red dashed: $\bar{x}=0$.}
 \label{fig:xbar_profiles}
 \end{figure}
 
 Figure~\ref{fig:xbar_profiles} displays the full $\bar{x}(k)$ profiles at $\alpha=0.8$ (Table~\ref{tab:det_cycle_boundary} summarises the survival structure):
 
-\paragraph{C = 10 (wide broad survival).}
-The traverse threshold is $\alpha^*(10) = 2\sqrt{10}/(10 - s^*(10)) \approx 2.06 > 0.8$: the Regime II analysis says $\beta_2 \to 1$ should \emph{not} produce survival at $\alpha=0.8$. Yet Fig.~\ref{fig:xbar_profiles} shows survival across almost all $k \in [0.05, \sim10]$ ($x_{\min}(\bar{x}) = -0.948$). This is a regime our analytic framework does not cover: at small burst scales, \textsc{Adam}'s $v_t$ does not fully decay between bursts even at moderate $\beta_2$, and the $C=10$ burst is too small to drive strong ratchet dynamics. The bisector at $C=10$ found a local sign-change edge ($k^*=2.26$) within a non-monotone profile, not a single survival boundary. The low-$\beta_2$ behavior at $C=10$ may also be related to \citet{reddi2018convergence}'s stability condition $\beta_1 < \sqrt{\beta_2}$: at $\beta_2=0.05$, $\sqrt{\beta_2} \approx 0.22 < \beta_1=0.9$, meaning the \emph{divergence mechanism} is not guaranteed by the theorem; this likely contributes to the survival island at low $k$. This regime is left as an open question.
+\paragraph{C = 10 (broad survival).}
+The traverse threshold is $\alpha^*(10) \approx 1.85 > 0.8$: the Regime II analysis says $\beta_2 \to 1$ should \emph{not} produce survival at $\alpha=0.8$. Yet Fig.~\ref{fig:xbar_profiles} shows survival across $k \in [0.05, 9.99]$ ($\min_k\bar{x}(k) = -0.948$), extending continuously to $k \to 0$ (the $\beta_2=0.999$ control has $k=0.01$ with $\bar{x}=-0.9486$). This small-burst regime is not covered by Regime II theory: $v_t$ does not fully decay between bursts even at moderate $\beta_2$, and the $C=10$ burst is too small to drive strong ratchet dynamics. Continuous bisection finds a local sign-change edge ($k^*=2.26$) within a non-monotone profile, not a single survival boundary. At low $\beta_2$ (high $k$), \citet{reddi2018convergence}'s stability condition $\beta_1 < \sqrt{\beta_2}$ is violated ($\sqrt{0.05} \approx 0.22 < \beta_1=0.9$), meaning the divergence mechanism is not guaranteed, contributing to survival.
 
-\paragraph{C = 30, 40, 50, 60, 70 (narrow Regime II islands).}
-At intermediate-to-large $C$, $\alpha^*(C)$ falls below $0.8$, so survival \emph{should} exist in a window $[\alpha^*, \alpha_{\text{up}}]$ at $\beta_2 \to 1$. The profiles confirm narrow islands at $k \ll 1$ (high $\beta_2$) that shrink with increasing $C$: at $C=30$, $n_{\text{cells}}=1$ ($k\approx0.05$); at $C=50$, $n_{\text{cells}}=4$ ($k\in[0.05,1.94]$); at $C=70$, $n_{\text{cells}}=1$ ($k\approx0.05$). The non-monotone $k^*(C)$ sequence (Table~\ref{tab:det_cycle_boundary}) reflects the bisector finding different edges of these islands, not a monotone boundary.
+\paragraph{C = 30, 40, 50, 60, 70 (empirical survival islands; only $k \to 0$ is Regime II).}
+At intermediate $C$, $\alpha^*(C)$ falls below $0.8$, so survival opens at high $\beta_2$. The profiles confirm islands that shrink with increasing $C$. At $C=30$ and $C=70$, the 80-point grid ($\Delta k = C/80$) samples 1 cell at $k=0.05$ before crossing the zero line, while continuous bisection pinpoints the exact boundaries at $k^*=0.30$ and $k^*=0.52$.
 
 \paragraph{C $\ge$ 75 (island closes).}
-The minimum cycle mean $\min_k\bar{x}(k)$ rises above $0$ at $C=75$ ($\bar{x}_{\min}=+0.029$): the survival island has vanished. This disappearance is an \emph{empirical finding}; the theory below predicts the lower opening threshold $\alpha^*(C)$ but does not yield a closed-form upper edge.
+Profiles at $C=75$ and $C=100$ show $\min_k\bar{x}(k) > 0$ for all $k$ ($+0.029$ at $C=75$, $+0.172$ at $C=100$): the survival island has closed empirically.
 
 \begin{table}[ht]
 \centering
 \scriptsize
 \setlength{\tabcolsep}{2.5pt}
-\caption{Survival structure at $\alpha=0.8$, $\beta_1=0.9$, $T_{\text{cycles}}=800$ (bisection tol.\ $|\beta_2^{\rm hi}-\beta_2^{\rm lo}|<10^{-6}$; source: \nolinkurl{results/deterministic_boundary_cycle_metric.csv}).}
+\caption{Empirical survival structure at $\alpha=0.8$, $\beta_1=0.9$, $T_{\text{cycles}}=800$ (bisection tol.\ $|\beta_2^{\rm hi}-\beta_2^{\rm lo}|<10^{-6}$; source: \nolinkurl{results/deterministic_boundary_cycle_metric.csv}).}
 \label{tab:det_cycle_boundary}
 \begin{tabular}{@{}r c c l p{2.4cm}@{}}
 \toprule
 $C$ & $\alpha^*(C)$ & $k^*$ & Survival $k$-island & Notes \\
 \midrule
-$10$  & $2.06$ & $2.26$ & $[0.05,\;\sim\!10]$ & $\alpha^*>0.8$; $\beta_1{<}\sqrt{\beta_2}$ relevant \\
-$30$  & $0.68$ & $0.30$ & $[0.05,\; 0.05]$ & Narrow Regime II island \\
-$40$  & $0.53$ & $1.50$ & $[0.05,\; 1.06]$ & Island at $k\le 1$ \\
-$50$  & $0.44$ & $2.51$ & $[0.05,\; 1.94]$ & Island at $k\le 2$ \\
-$60$  & $0.38$ & $2.25$ & $[0.05,\; 1.57]$ & Island shrinking \\
-$70$  & $0.34$ & $0.52$ & $[0.05,\; 0.05]$ & Island nearly closed \\
+$10$  & $1.85$ & $2.26$ & $[0.05,\;\sim\!10]$ & $\alpha^*>0.8$; $\beta_1{<}\sqrt{\beta_2}$ relevant \\
+$30$  & $0.65$ & $0.30$ & $[0.05,\; 0.05]$ & Narrow island \\
+$40$  & $0.51$ & $1.50$ & $[0.05,\; 1.06]$ & Island at $k\le 1$ \\
+$50$  & $0.43$ & $2.51$ & $[0.05,\; 1.94]$ & Island at $k\le 2$ \\
+$60$  & $0.37$ & $2.25$ & $[0.05,\; 1.57]$ & Island shrinking \\
+$70$  & $0.33$ & $0.52$ & $[0.05,\; 0.05]$ & Island nearly closed \\
 $\ge 75$ & $0.32$ & --- & none & Closed: $\min_k\bar{x}\ge 0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Derivations: Regime II Theory (Validity: $k \ll 1$)}
-The following analysis applies in Regime II ($\tau_2 \gg T_{\text{burst}}$, i.e., $k=(1-\beta_2)C \ll 1$), where $v_t$ remains approximately flat at $\tilde{v}_t \approx \mathbb{E}[g^2] \approx C$.
+When $\beta_2=0.9$ ($\tau_2=10$, Regime I), $v_t$ decays rapidly; across a grid of $\alpha \in [0.05, 1.0]$ in steps of $0.05$ ($T_{\text{cycles}}=800$), \textsc{Adam} fails unconditionally with $\bar{x} \ge +0.80$ (source: \nolinkurl{results/mechanism_probes/deterministic_alpha_sweep_P1.csv}). Conversely, in Regime II ($\tau_2 \gg T_{\text{burst}}$, i.e., $k=(1-\beta_2)C \ll 1$), $v_t$ remains flat at $\tilde{v}_t \approx \mathbb{E}[g^2] \approx C$.
 
 \paragraph{Derivation of Zero-Crossing $s^*$.}
-After a burst $g_1=+C$, the debiased first moment for non-burst steps is $\tilde{m}_t \approx \beta_1^t(1-\beta_1)C - (1-\beta_1^t)$. Setting $\tilde{m}_{s^*}=0$:
+After a burst $g_1=+C$, the debiased first moment for non-burst steps is $\tilde{m}_t \approx \beta_1^t(1-\beta_1)C - (1-\beta_1^t)$. Setting $\tilde{m}_{s^*}=0$ yields:
 \begin{equation}
-    s^*_{\rm exact}(C) = \frac{\ln\left((1-\beta_1)C+1\right)}{\ln(1/\beta_1)}.
+    s^*(C) = \frac{\ln\left((1-\beta_1)C+1\right)}{\ln(1/\beta_1)}.
     \label{eq:s_star_exact}
 \end{equation}
-For $C=100$: $s^*_{\rm exact}=22.76$ steps. A first-order Taylor approximation $\ln(1/\beta_1)\approx 1-\beta_1 = 1/\tau_1$ gives:
-\begin{equation}
-    s^*(C) \approx \tau_1\ln\left((1-\beta_1)C+1\right),
-    \label{eq:s_star_approx}
-\end{equation}
-yielding $s^*(100)\approx 23.98$ (5.4\% overestimate relative to exact; this error propagates into $\alpha^*$).
+For $C=100$: $s^*=22.76$ steps.
 
 \paragraph{Derivation of Traverse Threshold $\alpha^*(C)$.}
-For steps $s^*+1$ to $C$, the trajectory advances rightward at rate $\approx \alpha/\sqrt{C}$ per step. Full traversal ($\Delta x_{\rm right} \ge 2$) requires:
+For steps $s^*+1$ to $C$, \textsc{Adam} advances rightward at rate $\approx \alpha/\sqrt{C}$ per step. Full traversal ($\Delta x_{\rm right} \ge 2$) requires:
 \begin{equation}
-    \alpha^*(C) \approx \frac{2\sqrt{C}}{C - s^*(C)} \xrightarrow{C\gg s^*} \frac{2}{\sqrt{C}}.
+    \alpha^*(C) = \frac{2\sqrt{C}}{C - s^*(C)} \xrightarrow{C\gg s^*} \frac{2}{\sqrt{C}}.
     \label{eq:alpha_star_derived}
 \end{equation}
-Empirical validation (bisection at $\beta_2=0.999$, $T_{\rm cycles}=800$): observed $\alpha^*=0.2514$ vs.\ predicted $0.2631$ at $C=100$ (4.8\% error relative to observed bisection); observed $\alpha^*=0.1375$ vs.\ predicted $0.1304$ at $C=300$ (5.1\% error). All reported errors are relative to the empirical bisection value.
+
+\begin{table}[ht]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\caption{Traverse threshold $\alpha^*$ validation against bisection ($\beta_2=0.999, T_{\text{cycles}}=800$; source: \nolinkurl{results/mechanism_probes/alpha_star_bisection.csv}).}
+\label{tab:alpha_star_validation}
+\begin{tabular}{@{}r c c c c@{}}
+\toprule
+$C$ & Pred.~$\alpha^*$ & Bisect~$\alpha^*$ & Error & Survival Window \\
+\midrule
+$100$ & $0.2589$ & $0.2514$ & $3.0\%$ & $[0.251, 0.457]$ \\
+$300$ & $0.1295$ & $0.1375$ & $5.8\%$ & $[0.138, 0.155]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As shown in Table~\ref{tab:alpha_star_validation}, predicted $\alpha^*$ values match empirical bisection to within $3.0\%$ at $C=100$ and $5.8\%$ at $C=300$.
 
 \paragraph{Derivation of Sub-Threshold Pinned Band.}
 When $\alpha < \alpha^*(C)$, the rightward sweep cannot cross the domain and the trajectory pins at $+1$. The cycle mean is:
@@ -98,7 +110,7 @@ When $\alpha < \alpha^*(C)$, the rightward sweep cannot cross the domain and the
 At $C=100$: predicted $0.620$ at $\alpha=0.10$ (observed $0.602$, error 3.0\%) and predicted $0.240$ at $\alpha=0.20$ (observed $0.205$, error 17.1\%). The systematic overestimate at larger $\alpha$ is expected: as $\alpha$ grows, the orbit extends leftward and the $+1$-anchoring assumption weakens.
 
 \paragraph{Regime II Validity Condition.}
-The derivation assumes $v_t \approx \text{const}$, which requires $k=(1-\beta_2)C \ll 1$. At $C=300$, the observed survival window spans $[\alpha^*=0.1375,\, \alpha_{\rm up}\approx 0.155]$ (width ratio $\approx 1.13$), substantially narrower than the $\sim1.82$ ratio at $C=100$. This narrowing is consistent with the $k\ll 1$ approximation becoming less accurate as the window shrinks and $v_t$ fluctuations grow. At $C=1000$, $k = (1-\beta_2)C = 1.0$ even at $\beta_2=0.999$, so the validity condition is never satisfied: no Regime II window exists. The bisection boundaries at $C \in \{40, 50, 60\}$ (Table~\ref{tab:det_cycle_boundary}) lie at $k \in [0.5, 2.5]$ --- borderline for $k\ll 1$ --- which is why they are labeled as empirical islands rather than theory-predicted windows. The upper edge $\alpha_{\rm up}$ of the survival window lacks a closed-form derivation and should be treated as an empirical, $C$-dependent quantity.
+The derivation assumes $v_t \approx \text{const}$, which requires $k=(1-\beta_2)C \ll 1$. At $C=300$, the observed survival window spans $[\alpha^*=0.1375,\, \alpha_{\rm up}\approx 0.155]$ (width ratio $\approx 1.13$), substantially narrower than the $\sim1.82$ ratio at $C=100$. At $C=1000$, $k = (1-\beta_2)C = 1.0$ even at $\beta_2=0.999$, so the validity condition is never satisfied: no Regime II window exists. The upper edge $\alpha_{\rm up}$ of the survival window lacks a closed-form derivation and is an empirical, $C$-dependent quantity.
 
 \subsection{Small-$C$ Stochastic Arrival Timing Diagnostic}
 At $C=10$ ($T=550, \delta=0.10, \alpha=0.8, \beta_1=0.9, \beta_2=0.5, N=500$ seeds; see Table~\ref{tab:frozen_hyperparams}, source: \nolinkurl{results/mechanism_probes/terminal_burst_timing_diagnostic.csv}), stochastic outcomes are governed by the arrival timing of late bursts before horizon $T$. Diagnostic evaluation reveals a strong point-biserial correlation between failure ($x_T > 0.5$) and time elapsed since the last burst ($r_{\rm pb}=0.312$, $p=9.8\times10^{-13}$). Failed seeds experienced $11.76 \pm 0.41$ steps since their last burst vs.\ $6.00 \pm 0.27$ for surviving seeds.

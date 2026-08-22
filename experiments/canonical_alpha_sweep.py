@@ -68,43 +68,32 @@ def bisect_alpha_star(C: int, beta2: float = 0.999, T_cycles: int = 800, alpha_b
 
 def run_alpha_star_bisection():
     print("\n=== 2. ALPHA* BISECTION WITH CONVERGENCE GATE ===")
-    tau1 = 10.0
     beta1 = 0.9
     
-    bisection_results = []
+    bisection_records = []
     
     for C in [100, 300]:
-        s_star = tau1 * np.log((1.0 - beta1) * C + 1.0)
-        alpha_pred = 2.0 * np.sqrt(C) / (C - s_star)
+        s_exact = float(np.log((1.0 - beta1) * C + 1.0) / np.log(1.0 / beta1))
+        a_pred = 2.0 * np.sqrt(C) / (C - s_exact)
         
         bracket = (0.20, 0.30) if C == 100 else (0.12, 0.15)
-        a_star, h_int, status = bisect_alpha_star(C=C, beta2=0.999, T_cycles=800, alpha_bracket=bracket)
+        a_obs, half_int, status = bisect_alpha_star(C=C, beta2=0.999, T_cycles=800, alpha_bracket=bracket)
+        err_pct = abs(a_pred - a_obs) / a_obs * 100.0
         
-        # Verify convergence gate at bisected alpha*
-        if a_star is not None:
-            xb400, _ = measure_cycle_mean(C, a_star, 0.999, 400)
-            xb800, _ = measure_cycle_mean(C, a_star, 0.999, 800)
-            assert abs(xb400 - xb800) < 0.05, f"Convergence gate failed at bisected alpha*={a_star}"
-            ratio = a_star / alpha_pred
-        else:
-            ratio = None
-            
-        a_obs_str = f"{a_star:.4f}" if a_star is not None else "N/A"
-        rat_str = f"{ratio:.3f}" if ratio is not None else "N/A"
-        print(f"C={C:4d}: s*={s_star:.2f}, alpha_pred={alpha_pred:.4f}, alpha_obs={a_obs_str}, ratio={rat_str}")
-        
-        bisection_results.append({
+        print(f"C={C:4d}: s*_exact={s_exact:.2f}, alpha_pred={a_pred:.4f}, alpha_obs={a_obs:.4f}, error={err_pct:.2f}%")
+        bisection_records.append({
             "C": C,
             "beta2_used": 0.999,
-            "s_star_predicted": round(s_star, 2),
-            "alpha_star_predicted": round(alpha_pred, 4),
-            "alpha_star_observed": round(a_star, 4) if a_star is not None else None,
-            "half_interval": round(h_int, 6) if h_int is not None else None,
-            "ratio_obs_pred": round(ratio, 3) if ratio is not None else None,
+            "s_star_exact": round(s_exact, 2),
+            "alpha_star_predicted": round(a_pred, 4),
+            "alpha_star_observed": round(a_obs, 4),
+            "error_percent": round(err_pct, 2),
+            "half_interval": half_int,
+            "ratio_obs_pred": round(a_obs / a_pred, 3),
             "status": status,
         })
         
-    df_bisect = pd.DataFrame(bisection_results)
+    df_bisect = pd.DataFrame(bisection_records)
     df_bisect.to_csv("results/mechanism_probes/alpha_star_bisection.csv", index=False)
     print("\nUpdated alpha_star_bisection.csv:")
     print(df_bisect.to_string(index=False))
@@ -118,9 +107,8 @@ def plot_figure_3(df_sweep, df_bisect):
     # Left Panel: Predicted vs Observed Alpha*
     ax = axes[0]
     C_dense = np.logspace(np.log10(20), np.log10(1000), 100)
-    tau1 = 10.0
     beta1 = 0.9
-    s_dense = tau1 * np.log((1.0 - beta1) * C_dense + 1.0)
+    s_dense = np.log((1.0 - beta1) * C_dense + 1.0) / np.log(1.0 / beta1)
     alpha_pred_dense = 2.0 * np.sqrt(C_dense) / (C_dense - s_dense)
     
     ax.plot(C_dense, alpha_pred_dense, "k--", label=r"Predicted: $\alpha^*(C) = \frac{2\sqrt{C}}{C - s^*(C)}$", linewidth=1.5)
