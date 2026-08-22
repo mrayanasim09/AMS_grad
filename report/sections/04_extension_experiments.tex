@@ -44,22 +44,22 @@ At intermediate-to-large $C$, $\alpha^*(C)$ falls below $0.8$, so survival \emph
 \paragraph{C $\ge$ 75 (island closes).}
 The minimum cycle mean $\min_k\bar{x}(k)$ rises above $0$ at $C=75$ ($\bar{x}_{\min}=+0.029$): the survival island has vanished. This disappearance is an \emph{empirical finding}; the theory below predicts the lower opening threshold $\alpha^*(C)$ but does not yield a closed-form upper edge.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
-\scriptsize
+\footnotesize
 \caption{Survival structure at $\alpha=0.8$, $\beta_1=0.9$, $T_{\text{cycles}}=800$ (bisection tol.\ $|\beta_2^{\rm hi}-\beta_2^{\rm lo}|<10^{-6}$).}
 \label{tab:det_cycle_boundary}
-\begin{tabular}{rclp{4cm}}
+\begin{tabular}{@{}r c l p{3.5cm}@{}}
 \toprule
 $C$ & $\alpha^*(C)$ & Survival island in $k$ & Notes \\
 \midrule
-$10$  & $2.06$ & $[0.05,\; \sim\!10]$ (wide) & $\alpha^*>0.8$; small-$C$ regime, not covered by Regime II theory \\
-$30$  & $0.68$ & $[0.05,\; 0.05]$ (1 cell) & Narrow Regime II island; bisector found $k^*=0.300$ \\
-$40$  & $0.53$ & $[0.05,\; 1.06]$ (3 cells) & Island at $k\le 1$; bisector found $k^*=1.501$ \\
-$50$  & $0.44$ & $[0.05,\; 1.94]$ (4 cells) & Island at $k\le 2$; bisector found $k^*=2.509$ \\
-$60$  & $0.38$ & $[0.05,\; 1.57]$ (3 cells) & Island shrinking; bisector found $k^*=2.248$ \\
-$70$  & $0.34$ & $[0.05,\; 0.05]$ (1 cell) & Island nearly closed; bisector found $k^*=0.520$ \\
-$\ge 75$ & $0.32$ & none & Island closed: $\min_k\bar{x}\ge 0$ for all tested $\beta_2$ \\
+$10$  & $2.06$ & $[0.05,\;\sim\!10]$ (wide) & $\alpha^*>0.8$; outside Regime II; $\beta_1{<}\sqrt{\beta_2}$ condition likely relevant \\
+$30$  & $0.68$ & $[0.05,\; 0.05]$ (1 cell) & Narrow Regime II island \\
+$40$  & $0.53$ & $[0.05,\; 1.06]$ (3 cells) & Island at $k\le 1$ \\
+$50$  & $0.44$ & $[0.05,\; 1.94]$ (4 cells) & Island at $k\le 2$ \\
+$60$  & $0.38$ & $[0.05,\; 1.57]$ (3 cells) & Island shrinking \\
+$70$  & $0.34$ & $[0.05,\; 0.05]$ (1 cell) & Island nearly closed \\
+$\ge 75$ & $0.32$ & none & Closed: $\min_k\bar{x}\ge 0$ for all tested $\beta_2$ \\
 \bottomrule
 \end{tabular}
 \end{table}
