@@ -16,7 +16,8 @@ so that $\mathbb{E}[g_t] = \delta > 0$ and the optimal parameter is $x^* = -1$. 
 \begin{table*}[t]
 \centering
 \scriptsize
-\caption{Experimental Parameters (all adaptive optimizers: $\epsilon = 10^{-8}$, $x_1 = 0$).}
+\setlength{\tabcolsep}{6pt}
+\caption{Experimental Parameters across Benchmarks (all adaptive optimizers use $\epsilon = 10^{-8}$, $x_1 = 0$).}
 \label{tab:frozen_hyperparams}
 \begin{tabular}{lcccccc}
 \toprule
@@ -26,9 +27,10 @@ Deterministic (Adam Fail) & $10$ & $500$ & $0.8$ & $0.9$ & $0.5$ & --- \\
 Deterministic (Adam Control) & $10$ & $500$ & $0.8$ & $0.9$ & $0.999$ & --- \\
 Deterministic (AMSGrad / AdaGrad) & $10$ & $500$ & $0.8$ & $0.9$ & $0.5$ & --- \\
 Stochastic CI Benchmark Suite ($N=200$) & $20$ & $5000$ & $0.8$ & $0.9$ & $0.5$ & $0.10$ \\
+Terminal Burst Timing Diagnostic ($N=500$) & $10$ & $550$ & $0.8$ & $0.9$ & $0.5$ & $0.10$ \\
 Stochastic Theory Resolution ($N=100$) & $20$ & $5000$ & $\{0.8,\, 0.8/\sqrt{t}\}$ & $0.9$ & $0.5$ & $0.50$ \\
 Stochastic Robustness Check ($N=20$) & $20$ & $10^6$ & $0.8/\sqrt{t}$ & $0.9$ & $0.5$ & $0.10$ \\
-Phase 4 Grid Sweep ($N=100$/cell) & $\{10,30,100,300,1000\}$ & $50(C+1)$ & $0.8$ & $0.9$ & $k/C$-grid & $0.10$ \\
+Phase 4 Grid Sweep ($N=100$/cell, $4{,}500$ runs) & $\{10,30,100,300,1000\}$ & $50(C+1)$ & $0.8$ & $0.9$ & $k/C$-grid & $0.10$ \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -101,7 +103,12 @@ In the stochastic setting ($C=20, \delta=0.10, T=5000, N=200$ seeds; source: \no
 \paragraph{Momentum Variance Cancellation \& Fokker-Planck Analysis.}
 For the AR(1) first moment $m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t$, the marginal variance is $\text{Var}(m) = \frac{1-\beta_1}{1+\beta_1}\text{Var}(g) = \text{Var}(g)/19$, while the Green--Kubo long-run temporal correlation contributes the reciprocal factor $(1+\beta_1)/(1-\beta_1)=19$, yielding a net cumulative displacement variance $\text{Var}(\sum_t \Delta x_t) \approx T\alpha^2\text{Var}(g)/\hat{v}$.
 
-Under $\delta=0.10$: $\hat{v} \approx (1-\beta_2)C^2 = 200$, $\text{Var}(g) \approx 21.89$, drift $\mu = -\alpha\delta T/\sqrt{\hat{v}} = -28.28$, $\sigma_{\text{eff}}^2 \approx 350.2$. The continuous Fokker-Planck stationary density $P(x) \propto e^{2\mu x/\sigma_{\text{eff}}^2}$ has exponent $\approx -0.16$, giving theoretical mean $\approx -0.08$ (matching observed $-0.08$ to $-0.17$). \emph{Scope caveat}: this diffusion approximation assumes a slow drift relative to the domain width and a stationary $\hat{v}$. At $\delta=0.50$ (the closing experiment), the same formulas yield a stationary mean of $\approx -0.20$, versus the observed $-0.634$, a 3$\times$ underestimate. The likely cause is burst-driven leftward excursions that clip at $-1$ and break the unclipped-Gaussian assumption; the closing experiment is included as a demonstration of the $\alpha_t \propto 1/\sqrt{t}$ regime (panel b), not as a Fokker-Planck validation.
+Under $\delta=0.10$: $\hat{v} \approx (1-\beta_2)C^2 = 200$, $\text{Var}(g) \approx 21.89$, drift $\mu = -\alpha\delta T/\sqrt{\hat{v}} = -28.28$, and $\sigma_{\text{eff}}^2 \approx 350.2$. The continuous Fokker-Planck stationary density $P(x) \propto e^{a x}$ on $[-1, 1]$ with exponent $a = \frac{2\mu}{\sigma_{\text{eff}}^2} \approx -0.1615$ yields the theoretical mean:
+\begin{equation}
+    \mathbb{E}[x] = \mathcal{L}(a) \triangleq \coth(a) - \frac{1}{a} \approx \frac{a}{3} \approx -0.054,
+    \label{eq:langevin_mean}
+\end{equation}
+where $\mathcal{L}(a)$ is the Langevin function. The predicted mean of $-0.054$ captures the mild negative tilt and falls within the empirical range of finite-seed evaluations (e.g., observed $-0.08$ to $-0.17$). \emph{Scope caveat}: this diffusion approximation assumes unclipped linear Brownian motion on $[-1, 1]$ and stationary $\hat{v}$. At $\delta=0.50$ (the closing experiment), where $a \approx -0.603$, Eq.~\eqref{eq:langevin_mean} gives $\mathcal{L}(-0.603) \approx -0.20$, versus the observed mean of $-0.634 \pm 0.537$ (a $3\times$ underestimate). The cause is that strong burst-driven leftward excursions clip at the boundary $x=-1$, violating the unclipped Fokker-Planck assumption; the closing experiment is included to demonstrate the $\alpha_t \propto 1/\sqrt{t}$ regime (panel b), not as a constant-$\alpha$ Fokker-Planck validation.
 
 \paragraph{Asymptotic Convergence under $\alpha_t \propto 1/\sqrt{t}$.}
 Figure~\ref{fig:stochastic_resolution} evaluates optimizers under $\alpha_t = 0.8/\sqrt{t}$ at $C=20, \delta=0.50, T=5000, N=100$. Under decreasing step size, \textsc{AMSGrad} concentrates at $x^*=-1$: $\mathbb{E}[x_T]=-0.988 \pm 0.031$ ($98\%$ of seeds $< -0.90$). \textsc{Adam} diverges to $+1$ ($\mathbb{E}[x_T]=+0.729$). Long-horizon evaluation at $T=10^6$ ($\delta=0.10, N=20$) confirms asymptotic lock-in: \textsc{AMSGrad} $-0.998$, \textsc{Adam} $+0.999$.
@@ -109,6 +116,6 @@ Figure~\ref{fig:stochastic_resolution} evaluates optimizers under $\alpha_t = 0.
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.92\textwidth]{figures/stochastic_theory_resolution.pdf}
-\caption{Resolution of stochastic counterexample ($C=20, \delta=0.50, T=5000, \beta_1=0.9, \beta_2=0.5, N=100$). (a) Under constant $\alpha=0.8$, \textsc{AMSGrad} produces a broad stationary distribution (empirical mean $-0.63$; Fokker-Planck approximation predicts $-0.20$ --- clipping at $-1$ accounts for the discrepancy). (b) Under $\alpha_t = 0.8/\sqrt{t}$, \textsc{AMSGrad} achieves sharp convergence to $x^*=-1$ (mean $-0.99$); \textsc{Adam} fails to $+1$ (mean $+0.73$). (c, d) Sample trajectories.}
+\caption{Resolution of stochastic counterexample ($C=20, \delta=0.50, T=5000, \beta_1=0.9, \beta_2=0.5, N=100$). (a) Under constant $\alpha=0.8$, \textsc{AMSGrad} produces a broad stationary distribution (empirical mean $-0.63$; unclipped Fokker-Planck Langevin prediction $-0.20$ --- boundary clipping at $-1$ accounts for the tighter concentration). (b) Under $\alpha_t = 0.8/\sqrt{t}$, \textsc{AMSGrad} achieves sharp convergence to $x^*=-1$ (mean $-0.99$); \textsc{Adam} fails to $+1$ (mean $+0.73$). (c, d) Sample trajectories.}
 \label{fig:stochastic_resolution}
 \end{figure*}

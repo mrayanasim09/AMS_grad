@@ -5,7 +5,7 @@
 \begin{quote}
 \textbf{A Priori Hypothesis:} The boundary $(1-\beta_2^*)$ scales as $C^{-1}$, i.e., the log-log slope $\partial \log(1-\beta_2^*)/\partial \log C \approx -1.00$.
 \end{quote}
-\paragraph{Decision rule.} A fitted slope in $[-1.2, -0.8]$ supports the hypothesis. The empirical $k^*(C)$ sequence (Table~\ref{tab:det_cycle_boundary}) is wildly non-monotone (values 2.26, 0.30, 1.50, 2.51, 2.25, 0.52 for $C=10,30,40,50,60,70$), with swings of $\sim 8\times$ and no single-valued power law. This \emph{non-monotonicity is itself the refutation}: the a priori hypothesis is rejected.
+\paragraph{Decision rule.} A fitted slope in $[-1.2, -0.8]$ supports the hypothesis. The empirical $k^*(C)$ sequence from bisection (Table~\ref{tab:det_cycle_boundary}; source: \nolinkurl{results/deterministic_boundary_cycle_metric.csv}) is wildly non-monotone (values $k^* = 2.26, 0.30, 1.50, 2.51, 2.25, 0.52$ for $C=10,30,40,50,60,70$), with swings of $\sim 8\times$ and no single-valued power law. This \emph{non-monotonicity is itself the refutation}: the a priori hypothesis is rejected.
 
 \subsection{Measurement Validity \& Stochastic Failure Surface}
 Single-point $x_T$ is phase-dependent in periodic deterministic objectives. We therefore use the cycle-averaged metric:
@@ -46,20 +46,21 @@ The minimum cycle mean $\min_k\bar{x}(k)$ rises above $0$ at $C=75$ ($\bar{x}_{\
 
 \begin{table}[ht]
 \centering
-\footnotesize
-\caption{Survival structure at $\alpha=0.8$, $\beta_1=0.9$, $T_{\text{cycles}}=800$ (bisection tol.\ $|\beta_2^{\rm hi}-\beta_2^{\rm lo}|<10^{-6}$).}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\caption{Survival structure at $\alpha=0.8$, $\beta_1=0.9$, $T_{\text{cycles}}=800$ (bisection tol.\ $|\beta_2^{\rm hi}-\beta_2^{\rm lo}|<10^{-6}$; source: \nolinkurl{results/deterministic_boundary_cycle_metric.csv}).}
 \label{tab:det_cycle_boundary}
-\begin{tabular}{@{}r c l p{3.5cm}@{}}
+\begin{tabular}{@{}r c c l p{2.4cm}@{}}
 \toprule
-$C$ & $\alpha^*(C)$ & Survival island in $k$ & Notes \\
+$C$ & $\alpha^*(C)$ & $k^*$ & Survival $k$-island & Notes \\
 \midrule
-$10$  & $2.06$ & $[0.05,\;\sim\!10]$ (wide) & $\alpha^*>0.8$; outside Regime II; $\beta_1{<}\sqrt{\beta_2}$ condition likely relevant \\
-$30$  & $0.68$ & $[0.05,\; 0.05]$ (1 cell) & Narrow Regime II island \\
-$40$  & $0.53$ & $[0.05,\; 1.06]$ (3 cells) & Island at $k\le 1$ \\
-$50$  & $0.44$ & $[0.05,\; 1.94]$ (4 cells) & Island at $k\le 2$ \\
-$60$  & $0.38$ & $[0.05,\; 1.57]$ (3 cells) & Island shrinking \\
-$70$  & $0.34$ & $[0.05,\; 0.05]$ (1 cell) & Island nearly closed \\
-$\ge 75$ & $0.32$ & none & Closed: $\min_k\bar{x}\ge 0$ for all tested $\beta_2$ \\
+$10$  & $2.06$ & $2.26$ & $[0.05,\;\sim\!10]$ & $\alpha^*>0.8$; $\beta_1{<}\sqrt{\beta_2}$ relevant \\
+$30$  & $0.68$ & $0.30$ & $[0.05,\; 0.05]$ & Narrow Regime II island \\
+$40$  & $0.53$ & $1.50$ & $[0.05,\; 1.06]$ & Island at $k\le 1$ \\
+$50$  & $0.44$ & $2.51$ & $[0.05,\; 1.94]$ & Island at $k\le 2$ \\
+$60$  & $0.38$ & $2.25$ & $[0.05,\; 1.57]$ & Island shrinking \\
+$70$  & $0.34$ & $0.52$ & $[0.05,\; 0.05]$ & Island nearly closed \\
+$\ge 75$ & $0.32$ & --- & none & Closed: $\min_k\bar{x}\ge 0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -86,7 +87,7 @@ For steps $s^*+1$ to $C$, the trajectory advances rightward at rate $\approx \al
     \alpha^*(C) \approx \frac{2\sqrt{C}}{C - s^*(C)} \xrightarrow{C\gg s^*} \frac{2}{\sqrt{C}}.
     \label{eq:alpha_star_derived}
 \end{equation}
-Empirical validation (bisection at $\beta_2=0.999$, $T_{\rm cycles}=800$): observed $\alpha^*=0.251$ vs.\ predicted $0.263$ at $C=100$ (4.8\% error relative to observed); observed $\alpha^*=0.1375$ vs.\ predicted $0.1305$ at $C=300$ (5.1\% error). Convention: all errors are relative to the empirical bisection value.
+Empirical validation (bisection at $\beta_2=0.999$, $T_{\rm cycles}=800$): observed $\alpha^*=0.2514$ vs.\ predicted $0.2631$ at $C=100$ (4.8\% error relative to observed bisection); observed $\alpha^*=0.1375$ vs.\ predicted $0.1304$ at $C=300$ (5.1\% error). All reported errors are relative to the empirical bisection value.
 
 \paragraph{Derivation of Sub-Threshold Pinned Band.}
 When $\alpha < \alpha^*(C)$, the rightward sweep cannot cross the domain and the trajectory pins at $+1$. The cycle mean is:
@@ -100,4 +101,4 @@ At $C=100$: predicted $0.620$ at $\alpha=0.10$ (observed $0.602$, error 3.0\%) a
 The derivation assumes $v_t \approx \text{const}$, which requires $k=(1-\beta_2)C \ll 1$. At $C=300$, the observed survival window spans $[\alpha^*=0.1375,\, \alpha_{\rm up}\approx 0.155]$ (width ratio $\approx 1.13$), substantially narrower than the $\sim1.82$ ratio at $C=100$. This narrowing is consistent with the $k\ll 1$ approximation becoming less accurate as the window shrinks and $v_t$ fluctuations grow. At $C=1000$, $k = (1-\beta_2)C = 1.0$ even at $\beta_2=0.999$, so the validity condition is never satisfied: no Regime II window exists. The bisection boundaries at $C \in \{40, 50, 60\}$ (Table~\ref{tab:det_cycle_boundary}) lie at $k \in [0.5, 2.5]$ --- borderline for $k\ll 1$ --- which is why they are labeled as empirical islands rather than theory-predicted windows. The upper edge $\alpha_{\rm up}$ of the survival window lacks a closed-form derivation and should be treated as an empirical, $C$-dependent quantity.
 
 \subsection{Small-$C$ Stochastic Arrival Timing Diagnostic}
-At $C=10$, stochastic outcomes are governed by the arrival timing of late bursts before $T$. Diagnostic evaluation ($N=500$ seeds; source: \nolinkurl{results/mechanism_probes/terminal_burst_timing_diagnostic.csv}) reveals a strong point-biserial correlation between failure ($x_T > 0.5$) and time elapsed since the last burst ($r_{\rm pb}=0.312$, $p=9.8\times10^{-13}$). Failed seeds experienced $11.76 \pm 0.41$ steps since their last burst vs.\ $6.00 \pm 0.27$ for surviving seeds.
+At $C=10$ ($T=550, \delta=0.10, \alpha=0.8, \beta_1=0.9, \beta_2=0.5, N=500$ seeds; see Table~\ref{tab:frozen_hyperparams}, source: \nolinkurl{results/mechanism_probes/terminal_burst_timing_diagnostic.csv}), stochastic outcomes are governed by the arrival timing of late bursts before horizon $T$. Diagnostic evaluation reveals a strong point-biserial correlation between failure ($x_T > 0.5$) and time elapsed since the last burst ($r_{\rm pb}=0.312$, $p=9.8\times10^{-13}$). Failed seeds experienced $11.76 \pm 0.41$ steps since their last burst vs.\ $6.00 \pm 0.27$ for surviving seeds.
