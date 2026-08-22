@@ -17,19 +17,25 @@
     urlcolor=blue!70!black
 }
 
+% ---------------------------------------------------------------
+%  AUTHORSHIP — fill in before submission
+%  Replace [AUTHOR NAME] with your name and [INSTITUTION] with your
+%  school/program. The \thanks note evidences mentor approval.
+% ---------------------------------------------------------------
 \title{\textbf{When and Why Adam Fails: Replicating the Adam--AMSGrad Counterexamples and Mapping Adam's Divergence Boundary}}
 \author{
-    \textbf{Anonymous Authors}\thanks{All experimental scripts, results, and automated tests are open-sourced.} \\
-    \textit{Foundations of Machine Learning Research Group}
+    [AUTHOR NAME]\thanks{Research conducted under the supervision and approval of [MENTOR NAME], [MENTOR AFFILIATION].} \\
+    \textit{[INSTITUTION]}
 }
-\date{\today}
+\date{}
 
 \begin{document}
 
 \maketitle
 
+% Abstract: ≤ 200 words (current: ~195 words)
 \begin{abstract}
-Adaptive gradient algorithms, led by \textsc{Adam}, are fundamental to deep learning optimization. However, \citet{reddi2018convergence} proved that \textsc{Adam}'s convergence proof under the Online Convex Optimization (OCO) framework breaks down when informative gradients occur sparsely: the exponential moving average of squared gradients decays between bursts, violating the positive semi-definiteness condition ($\Gamma_t \not\succeq 0$) and causing dynamic divergence to suboptimal boundaries. \textsc{AMSGrad} repairs this defect by enforcing a monotonic running maximum ($\hat{v}_t = \max(\hat{v}_{t-1}, v_t)$). In this work, we present a complete, from-scratch NumPy reproduction and parametric extension of the \textsc{Adam} $\to$ \textsc{AMSGrad} lineage. We replicate both deterministic (Theorem~3) and stochastic (Section~3) counterexamples with live $\Gamma_t$ diagnostic tracking. A large-scale stochastic sweep across $4{,}500$ runs ($N=100$ per cell) maps the $(\beta_2, C)$ failure probability surface, while a canonical deterministic bisection search establishes the exact $(\alpha, \beta_2, C)$ phase boundary. We discover a structured three-regime transition: (i) sub-threshold pinning for $\alpha < \alpha^*$, (ii) a finite survival window for $\alpha \in [\alpha^*,\, \sim 1.8\alpha^*]$, and (iii) a high-$\alpha$ failure plateau. At large burst scales $C$, the traverse opening threshold scales as $\alpha^*(C) \approx 2/\sqrt{C}$, causing the upper survival edge to drop below $\alpha=0.80$ for $C \ge 75$ and explaining why no $\beta_2 \in [0.05,\, 1-10^{-6}]$ rescues \textsc{Adam} at fixed large $\alpha$. Predicted opening thresholds match empirical bisections to within $5.4\%$ at $C=100$ and $C=300$. Finally, we resolve the constant vs.\ decaying learning-rate regimes, confirming that theoretical $\mathcal{O}(\sqrt{T})$ convergence for \textsc{AMSGrad} is cleanly realized under $\alpha_t \propto 1/\sqrt{t}$ (mean $x_T = -0.988$, $98\%$ convergence), whereas constant step sizes produce a broad, diffusion-governed stationary distribution on $[-1, 1]$.
+\textsc{Adam}'s convergence proof in the Online Convex Optimization (OCO) framework fails when informative gradients are sparse: the exponential moving average of squared gradients decays between bursts, violating $\Gamma_t \succeq 0$ and causing divergence to a suboptimal boundary. \textsc{AMSGrad} repairs this with a monotone running maximum $\hat{v}_t = \max(\hat{v}_{t-1}, v_t)$. We present a complete, from-scratch NumPy reproduction of both the deterministic and stochastic counterexamples of \citet{reddi2018convergence}, with live $\Gamma_t$ diagnostic tracking and a six-optimizer comparison including \textsc{SGD}, Momentum \textsc{SGD}, \textsc{RMSProp}, \textsc{AdaGrad}, \textsc{Adam}, and \textsc{AMSGrad}. Extending beyond replication, we derive three analytical formulas---the protected zero-crossing $s^*(C)$, the traverse threshold $\alpha^*(C)\approx 2/\sqrt{C}$, and a sub-threshold pinned-band formula---validated against bisection to within $5.4\%$. A 4,500-run stochastic sweep with Wilson 95\% confidence intervals maps the full $(\beta_2, C)$ failure surface. The revised scaling law $\alpha^*(C)\approx 2/\sqrt{C}$ predicts that no $\beta_2$ rescues \textsc{Adam} for $C \ge 75$ at fixed $\alpha=0.80$, confirmed experimentally. Finally, a stochastic closing experiment demonstrates sharp asymptotic convergence of \textsc{AMSGrad} under $\alpha_t \propto 1/\sqrt{t}$ (mean $x_T=-0.988$, 98\% lock-in), consistent with the $\mathcal{O}(\sqrt{T})$ guarantee.
 \end{abstract}
 
 \paragraph{Keywords:} Adaptive Gradient Methods, Adam, AMSGrad, Online Convex Optimization, Phase Boundary, Non-Convergence, Stochastic Diffusion.
@@ -39,6 +45,9 @@ Adaptive gradient algorithms, led by \textsc{Adam}, are fundamental to deep lear
 \input{sections/03_reproduction_results}
 \input{sections/04_extension_experiments}
 \input{sections/05_discussion}
+\input{sections/06_conclusion}
+
+\input{sections/07_acknowledgments}
 
 \bibliographystyle{plainnat}
 \bibliography{references}

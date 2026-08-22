@@ -1,0 +1,13 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We have presented a complete, reproducible investigation of \textsc{Adam}'s non-convergence in the Online Convex Optimization (OCO) setting and mapped its full $(\alpha, \beta_2, C)$ phase structure.
+
+\paragraph{Key Findings.}
+The fundamental cause of \textsc{Adam}'s failure is that its exponential moving average second moment $v_t$ decays between gradient bursts, rendering the OCO telescoping bound invalid ($\Gamma_t \not\succeq 0$). \textsc{AMSGrad} resolves this by enforcing monotone $\hat{v}_t$. We derive three analytical formulas from first principles---the protected zero-crossing $s^*(C)$, the traverse threshold $\alpha^*(C) \approx 2/\sqrt{C}$, and the sub-threshold pinned band---and validate each against canonical bisection results to within $5.4\%$. The revised scaling law $\alpha^*(C) \approx 2/\sqrt{C}$ reveals that the $\beta_2$-boundary disappears for $C \ge 75$ at $\alpha=0.80$, explaining why no second-moment decay rate rescues \textsc{Adam} at large burst scale and fixed step size. A 4,500-run stochastic heatmap confirms this failure surface empirically with Wilson 95\% confidence intervals.
+
+\paragraph{Limitations.}
+This study is restricted to the one-dimensional projected OCO counterexample setting ($d=1$, $\mathcal{F}=[-1,1]$, linear losses $f_t(x) = g_t x$). All phase-boundary results at fixed $\alpha=0.80$ and $\beta_1=0.9$; different hyperparameter regimes may exhibit qualitatively different phase diagrams. The stochastic sweep uses a limited grid of 8 $k$-values per $C$ (sparse in the low-$\beta_2$ region), and the $T=50(C+1)$ horizon may not fully capture long-transient behavior at large $C$. Extensions to multi-dimensional objectives, non-linear losses, or practical deep learning objectives are left to future work.
+
+\paragraph{Future Directions.}
+The quantitative $(\alpha, \beta_2, C)$ phase diagram suggests that a theoretically-grounded, burst-aware adaptive $\beta_2$ schedule could recover convergence without the conservatism of \textsc{AMSGrad}'s global maximum. The stationary-distribution analysis under constant step sizes also opens a natural connection to diffusion-process methods for characterizing convergence noise in adaptive optimizers.
