@@ -19,8 +19,7 @@
 
 \title{\textbf{When and Why Adam Fails: Replicating the Adam--AMSGrad Counterexamples and Mapping Adam's Divergence Boundary}}
 \author{
-    \textbf{Rayyan A.}\thanks{Research conducted under the faculty mentorship of Dr.~E.~H.~Kaufman. Source code and experiment logs: \url{https://github.com/anonymous/ams-grad-counterexample-study}.} \\
-    \textit{Department of Computational Mathematics \& Computer Science}
+    \textbf{Muhammad Rayan Asim}\thanks{Research conducted under the faculty mentorship of Dr.~E.~H.~Kaufman. Source code and experiment logs: \url{https://github.com/mrayanasim09/AMS_grad}.}
 }
 \date{}
 
@@ -28,9 +27,9 @@
 
 \maketitle
 
-% Abstract: ≤ 200 words (exactly 182 words)
+% Abstract: ≤ 200 words (179 words)
 \begin{abstract}
-\textsc{Adam}'s convergence proof in the Online Convex Optimization (OCO) framework fails when informative gradients are sparse: the exponential moving average of squared gradients decays between bursts, violating $\Gamma_t \succeq 0$ and causing divergence to a suboptimal boundary. \textsc{AMSGrad} repairs this with a monotone running maximum. We present a from-scratch NumPy reproduction of the deterministic and stochastic counterexamples of Reddi et al., with live $\Gamma_t$ diagnostics and a six-optimizer comparison. Extending beyond replication, we derive a protected zero-crossing $s^*(C)$ and a traverse threshold $\alpha^*(C) \approx 2/\sqrt{C}$, validated against empirical bisection to within $3\text{--}6\%$, plus a sub-threshold pinned-band formula (errors $3\text{--}17\%$, consistent with weakening $+1$-anchoring). A 4,500-run stochastic sweep maps the $(\beta_2, C)$ failure surface with Wilson 95\% confidence intervals. Full cycle-averaged profiles reveal a non-monotone survival structure: broad survival at small burst scale, shrinking survival islands at intermediate burst scale, and empirical closure of all islands by $C \ge 75$ at fixed $\alpha = 0.80$, refuting our a priori power-law scaling hypothesis. A closing experiment confirms sharp \textsc{AMSGrad} convergence under $\alpha_t \propto 1/\sqrt{t}$ (mean $x_T = -0.988$), consistent with the $\mathcal{O}(\sqrt{T})$ guarantee.
+\textsc{Adam}'s convergence proof in the Online Convex Optimization (OCO) framework fails when informative gradients are sparse: the exponential moving average of squared gradients decays between bursts, violating $\Gamma_t \succeq 0$ and causing divergence to a suboptimal boundary. \textsc{AMSGrad} repairs this with a monotone running maximum. We present a from-scratch NumPy reproduction of the deterministic and stochastic counterexamples of Reddi et al., with live $\Gamma_t$ diagnostics and a six-optimizer comparison. Extending beyond replication, we derive a protected zero-crossing $s^*(C)$ and a traverse threshold $\alpha^*(C) \approx 2/\sqrt{C}$, validated against empirical bisection to within $3\text{--}6\%$, plus a sub-threshold pinned-band formula (errors $2\text{--}11\%$, consistent with weakening $+1$-anchoring). A 4,500-run stochastic sweep maps the $(\beta_2, C)$ failure surface with Wilson 95\% confidence intervals. Full cycle-averaged profiles reveal a non-monotone survival structure: broad survival at small burst scale, shrinking survival islands at intermediate burst scale, and empirical closure of all islands by $C \ge 75$ at fixed $\alpha = 0.80$, refuting our a priori power-law scaling hypothesis. A closing experiment confirms sharp \textsc{AMSGrad} convergence under $\alpha_t \propto 1/\sqrt{t}$ (mean $x_T = -0.988$), consistent with the $\mathcal{O}(\sqrt{T})$ guarantee.
 \end{abstract}
 
 \paragraph{Keywords:} Adaptive Gradient Methods, Adam, AMSGrad, Online Convex Optimization, Phase Boundary, Non-Convergence, Stochastic Diffusion.

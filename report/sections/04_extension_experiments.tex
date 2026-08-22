@@ -5,7 +5,7 @@
 \begin{quote}
 \textbf{A Priori Hypothesis:} The boundary $(1-\beta_2^*)$ scales as $C^{-1}$, i.e., the log-log slope $\partial \log(1-\beta_2^*)/\partial \log C \approx -1.00$.
 \end{quote}
-\paragraph{Decision rule.} A fitted slope in $[-1.2, -0.8]$ supports the hypothesis. The empirical $k^*(C)$ sequence from bisection (Table~\ref{tab:det_cycle_boundary}; source: \nolinkurl{results/deterministic_boundary_cycle_metric.csv}) is wildly non-monotone (values $k^* = 2.26, 0.30, 1.50, 2.51, 2.25, 0.52$ for $C=10,30,40,50,60,70$), with swings of $\sim 8\times$ and no single-valued power law. This \emph{non-monotonicity is itself the refutation}: the a priori hypothesis is rejected.
+\paragraph{Decision rule.} A fitted slope in $[-1.2, -0.8]$ supports the hypothesis. The empirical $k^*(C)$ sequence from bisection (Table~\ref{tab:det_cycle_boundary}; source: \nolinkurl{results/deterministic_boundary_cycle_metric.csv}) is strongly non-monotone (values $k^* = 2.26, 0.30, 1.50, 2.51, 2.25, 0.52$ for $C=10,30,40,50,60,70$), with swings of $\sim 8\times$ and no single-valued power law. This \emph{non-monotonicity is itself the refutation}: the a priori hypothesis is rejected.
 
 \subsection{Measurement Validity \& Stochastic Failure Surface}
 Single-point $x_T$ is phase-dependent in periodic deterministic objectives. We therefore use the cycle-averaged metric:
@@ -39,7 +39,7 @@ Figure~\ref{fig:xbar_profiles} displays the full $\bar{x}(k)$ profiles at $\alph
 The traverse threshold is $\alpha^*(10) \approx 1.85 > 0.8$: the Regime II analysis says $\beta_2 \to 1$ should \emph{not} produce survival at $\alpha=0.8$. Yet Fig.~\ref{fig:xbar_profiles} shows survival across $k \in [0.05, 9.99]$ ($\min_k\bar{x}(k) = -0.948$), extending continuously to $k \to 0$ (the $\beta_2=0.999$ control has $k=0.01$ with $\bar{x}=-0.9486$). This small-burst regime is not covered by Regime II theory: $v_t$ does not fully decay between bursts even at moderate $\beta_2$, and the $C=10$ burst is too small to drive strong ratchet dynamics. Continuous bisection finds a local sign-change edge ($k^*=2.26$) within a non-monotone profile, not a single survival boundary. At low $\beta_2$ (high $k$), \citet{reddi2018convergence}'s stability condition $\beta_1 < \sqrt{\beta_2}$ is violated ($\sqrt{0.05} \approx 0.22 < \beta_1=0.9$), meaning the divergence mechanism is not guaranteed, contributing to survival.
 
 \paragraph{C = 30, 40, 50, 60, 70 (empirical survival islands; only $k \to 0$ is Regime II).}
-At intermediate $C$, $\alpha^*(C)$ falls below $0.8$, so survival opens at high $\beta_2$. The profiles confirm islands that shrink with increasing $C$. At $C=30$ and $C=70$, the 80-point grid ($\Delta k = C/80$) samples 1 cell at $k=0.05$ before crossing the zero line, while continuous bisection pinpoints the exact boundaries at $k^*=0.30$ and $k^*=0.52$.
+At intermediate $C$, $\alpha^*(C)$ falls below $0.8$, so survival opens at high $\beta_2$. The profiles confirm islands that shrink with increasing $C$. On an 80-point grid uniform in $k$ over $[0.05, C]$ ($\Delta k \approx C/80$), the survival set at $C=30$ and $C=70$ samples 1 cell at $k=0.05$ before crossing zero, while continuous bisection pinpoints the exact zero-crossings at $k^*=0.30$ and $k^*=0.52$.
 
 \paragraph{C $\ge$ 75 (island closes).}
 Profiles at $C=75$ and $C=100$ show $\min_k\bar{x}(k) > 0$ for all $k$ ($+0.029$ at $C=75$, $+0.172$ at $C=100$): the survival island has closed empirically.
@@ -48,7 +48,7 @@ Profiles at $C=75$ and $C=100$ show $\min_k\bar{x}(k) > 0$ for all $k$ ($+0.029$
 \centering
 \scriptsize
 \setlength{\tabcolsep}{2.5pt}
-\caption{Empirical survival structure at $\alpha=0.8$, $\beta_1=0.9$, $T_{\text{cycles}}=800$ (bisection tol.\ $|\beta_2^{\rm hi}-\beta_2^{\rm lo}|<10^{-6}$; source: \nolinkurl{results/deterministic_boundary_cycle_metric.csv}).}
+\caption{Empirical survival structure at $\alpha=0.8$, $\beta_1=0.9$, $T_{\text{cycles}}=800$ (bisection tol.\ $|\beta_2^{\rm hi}-\beta_2^{\rm lo}|<10^{-6}$; source: \nolinkurl{results/deterministic_boundary_cycle_metric.csv}). \emph{Note:} The 'Survival $k$-island' column reports discrete cells surviving on the 80-point uniform grid on $[0.05, C]$, whereas $k^*$ is the continuous bisection zero-crossing.}
 \label{tab:det_cycle_boundary}
 \begin{tabular}{@{}r c c l p{2.4cm}@{}}
 \toprule
@@ -66,7 +66,7 @@ $\ge 75$ & $0.32$ & --- & none & Closed: $\min_k\bar{x}\ge 0$ \\
 \end{table}
 
 \subsection{Derivations: Regime II Theory (Validity: $k \ll 1$)}
-When $\beta_2=0.9$ ($\tau_2=10$, Regime I), $v_t$ decays rapidly; across a grid of $\alpha \in [0.05, 1.0]$ in steps of $0.05$ ($T_{\text{cycles}}=800$), \textsc{Adam} fails unconditionally with $\bar{x} \ge +0.80$ (source: \nolinkurl{results/mechanism_probes/deterministic_alpha_sweep_P1.csv}). Conversely, in Regime II ($\tau_2 \gg T_{\text{burst}}$, i.e., $k=(1-\beta_2)C \ll 1$), $v_t$ remains flat at $\tilde{v}_t \approx \mathbb{E}[g^2] \approx C$.
+When $\beta_2=0.9$ ($\tau_2=10$, Regime I at $C=100$), $v_t$ decays rapidly; across a grid of $\alpha \in [0.05, 1.0]$ in steps of $0.05$ ($T_{\text{cycles}}=800$), \textsc{Adam} fails unconditionally with $\bar{x} \ge +0.80$ (source: \nolinkurl{results/mechanism_probes/deterministic_alpha_sweep_P1.csv}). Conversely, in Regime II ($\tau_2 \gg T_{\text{burst}}$, i.e., $k=(1-\beta_2)C \ll 1$), $v_t$ remains flat at $\tilde{v}_t \approx \mathbb{E}[g^2] \approx C$.
 
 \paragraph{Derivation of Zero-Crossing $s^*$.}
 After a burst $g_1=+C$, the debiased first moment for non-burst steps is $\tilde{m}_t \approx \beta_1^t(1-\beta_1)C - (1-\beta_1^t)$. Setting $\tilde{m}_{s^*}=0$ yields:
@@ -107,7 +107,7 @@ When $\alpha < \alpha^*(C)$, the rightward sweep cannot cross the domain and the
     \bar{x} \approx 1 - \frac{\alpha(C-s^*(C))}{2\sqrt{C}}.
     \label{eq:pinned_formula}
 \end{equation}
-At $C=100$: predicted $0.620$ at $\alpha=0.10$ (observed $0.602$, error 3.0\%) and predicted $0.240$ at $\alpha=0.20$ (observed $0.205$, error 17.1\%). The systematic overestimate at larger $\alpha$ is expected: as $\alpha$ grows, the orbit extends leftward and the $+1$-anchoring assumption weakens.
+For $C=100$: Eq.~\eqref{eq:pinned_formula} predicts $\bar{x} = 0.614$ at $\alpha=0.10$ (observed $0.602$, error 2.0\%) and predicted $\bar{x} = 0.228$ at $\alpha=0.20$ (observed $0.205$, error 11.0\%). The systematic overestimate at larger $\alpha$ is expected: as $\alpha$ grows, the orbit extends leftward and the $+1$-anchoring assumption weakens.
 
 \paragraph{Regime II Validity Condition.}
 The derivation assumes $v_t \approx \text{const}$, which requires $k=(1-\beta_2)C \ll 1$. At $C=300$, the observed survival window spans $[\alpha^*=0.1375,\, \alpha_{\rm up}\approx 0.155]$ (width ratio $\approx 1.13$), substantially narrower than the $\sim1.82$ ratio at $C=100$. At $C=1000$, $k = (1-\beta_2)C = 1.0$ even at $\beta_2=0.999$, so the validity condition is never satisfied: no Regime II window exists. The upper edge $\alpha_{\rm up}$ of the survival window lacks a closed-form derivation and is an empirical, $C$-dependent quantity.

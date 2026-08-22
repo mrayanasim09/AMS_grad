@@ -129,8 +129,8 @@ def plot_2x2_figure(df_dist, traj_ac, traj_amsc, traj_ad, traj_amsd):
     # Top-Left: Constant Step Size Distribution
     ax = axes[0, 0]
     bins = np.linspace(-1.05, 1.05, 22)
-    ax.hist(df_dist["adam_const_xT"], bins=bins, alpha=0.6, color="tab:red", label=rf"Adam ($\mu={df_dist['adam_const_xT'].mean():+.2f}$)")
-    ax.hist(df_dist["amsgrad_const_xT"], bins=bins, alpha=0.6, color="tab:blue", label=rf"AMSGrad ($\mu={df_dist['amsgrad_const_xT'].mean():+.2f}$)")
+    ax.hist(df_dist["adam_const_xT"], bins=bins, alpha=0.6, color="tab:red", label=rf"Adam ($\mathrm{{mean}}={df_dist['adam_const_xT'].mean():+.2f}$)")
+    ax.hist(df_dist["amsgrad_const_xT"], bins=bins, alpha=0.6, color="tab:blue", label=rf"AMSGrad ($\mathrm{{mean}}={df_dist['amsgrad_const_xT'].mean():+.2f}$)")
     ax.set_title(r"(a) Constant Step Size ($\alpha=0.8$): Diffuse Stationary Distribution", fontsize=10, fontweight="bold")
     ax.set_xlabel(r"Terminal Position $x_T$", fontsize=9)
     ax.set_ylabel("Seed Count", fontsize=9)
@@ -139,8 +139,8 @@ def plot_2x2_figure(df_dist, traj_ac, traj_amsc, traj_ad, traj_amsd):
 
     # Top-Right: Decreasing Step Size Distribution
     ax = axes[0, 1]
-    ax.hist(df_dist["adam_dec_xT"], bins=bins, alpha=0.6, color="tab:red", label=rf"Adam ($\mu={df_dist['adam_dec_xT'].mean():+.2f}$)")
-    ax.hist(df_dist["amsgrad_dec_xT"], bins=bins, alpha=0.6, color="tab:blue", label=rf"AMSGrad ($\mu={df_dist['amsgrad_dec_xT'].mean():+.2f}$)")
+    ax.hist(df_dist["adam_dec_xT"], bins=bins, alpha=0.6, color="tab:red", label=rf"Adam ($\mathrm{{mean}}={df_dist['adam_dec_xT'].mean():+.2f}$)")
+    ax.hist(df_dist["amsgrad_dec_xT"], bins=bins, alpha=0.6, color="tab:blue", label=rf"AMSGrad ($\mathrm{{mean}}={df_dist['amsgrad_dec_xT'].mean():+.2f}$)")
     ax.set_title(r"(b) Decreasing Step Size ($\alpha_t = 0.8/\sqrt{t}$): Asymptotic Convergence", fontsize=10, fontweight="bold")
     ax.set_xlabel(r"Terminal Position $x_T$", fontsize=9)
     ax.set_ylabel("Seed Count", fontsize=9)
